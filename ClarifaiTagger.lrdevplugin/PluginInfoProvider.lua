@@ -9,6 +9,12 @@ local function trim(s)
    return string.gsub(s, '^%s*(.-)%s*$', '%1')
 end
 
+local function getOrDefault(value, default)
+   if value == nil then
+      return default
+   end
+   return value
+end
 
 local function sectionsForTopOfDialog(viewFactory, properties)
    local f = viewFactory;
@@ -21,8 +27,11 @@ local function sectionsForTopOfDialog(viewFactory, properties)
    properties.clientId = prefs.clientId;
    properties.clientSecret = prefs.clientSecret;
    properties.accessToken = prefs.accessToken;
-   properties.imageSize = tonumber(prefs.imageSize) or 400;
-   properties.keywordLanguage = prefs.keywordLanguage or '';
+   properties.imageSize = getOrDefault(tonumber(prefs.imageSize), 400);
+   properties.keywordLanguage = getOrDefault(prefs.keywordLanguage, '');
+   properties.boldExistingKeywords = getOrDefault(prefs.boldExistingKeywords, true);
+   properties.autoCheckForExistingKeywords = getOrDefault(prefs.autoCheckForExistingKeywords, true);
+   properties.showProbability = getOrDefault(prefs.showProbability, false);
 
    return {
       {
@@ -79,6 +88,36 @@ local function sectionsForTopOfDialog(viewFactory, properties)
          },
 
          f:separator { fill_horizontal = 1 },
+      },
+
+      {
+         title = LOC '$$$/ClarifaiTagger/Preferences/Tagging=Tagging',
+         bind_to_object = properties,
+
+         f:row {
+            spacing = f:control_spacing(),
+
+            f:checkbox {
+               title = LOC '$$$/ClarifaiTagger/Preferences/BoldExistingKeywords=Bold Existing Keywords',
+               value = bind 'boldExistingKeywords'
+            },
+         },
+         f:row {
+            spacing = f:control_spacing(),
+
+            f:checkbox {
+               title = LOC '$$$/ClarifaiTagger/Preferences/AutoCheckForExistingKeywords=Auto Check for Existing Keywords',
+               value = bind 'autoCheckForExistingKeywords'
+            },
+         },
+         f:row {
+            spacing = f:control_spacing(),
+
+            f:checkbox {
+               title = LOC '$$$/ClarifaiTagger/Preferences/showProbability=Show Probability',
+               value = bind 'showProbability'
+            },
+         },
       },
 
       {
@@ -192,6 +231,9 @@ local function endDialog(properties)
    prefs.accessToken = trim(properties.accessToken);
    prefs.imageSize = tonumber(properties.imageSize);
    prefs.keywordLanguage = trim(properties.keywordLanguage);
+   prefs.boldExistingKeywords = properties.boldExistingKeywords;
+   prefs.autoCheckForExistingKeywords = properties.autoCheckForExistingKeywords;
+   prefs.showProbability = properties.showProbability;
 end
 
 

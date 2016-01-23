@@ -20,27 +20,32 @@ local function makeLabel(i, j)
    return 'check_' .. tostring(i) .. '_' .. tostring(j);
 end
 
-local function makeCheckbox(i, j, keyword, prob)
+local function makeCheckbox(i, j, keyword, prob, boldKeywords, showProbability)
    local f = LrView.osFactory();
 
-   return f:checkbox {
-      title = string.format('%s (%2.1f)', keyword, prob * 100),
+   local checkbox = {
+      title = keyword,
       value = LrView.bind(makeLabel(i, j)),
+   }
+
+   if boldKeywords then
+      checkbox.font = '<system/bold>';
+   end
+
+   if not showProbability then
+      return f:checkbox(checkbox)
+   end
+
+   return f:row {
+      f:checkbox(checkbox),
+      f:static_text {
+         title = string.format('(%2.1f)', prob * 100),
+         text_color = LrColor(0.5, 0.5, 0.5),
+      }
    }
 end
 
-local function hasKeyword(photo, keyword)
-   local keywords = photo:getRawMetadata('keywords');
-   for _, k in ipairs(keywords) do
-      if k:getName() == keyword then
-         return true
-      end
-   end
-
-   return false
-end
-
-local function contains(keyword, keywords)
+local function containsInStringArray(keyword, keywords)
    for _, k in ipairs(keywords) do
       if k == keyword then
          return true
@@ -50,12 +55,26 @@ local function contains(keyword, keywords)
    return false
 end
 
+local function containsInKeywordArray(keyword, keywords)
+   for _, k in ipairs(keywords) do
+      if k:getName() == keyword then
+         return true
+      end
+   end
+
+   return false
+end
+
+local function hasKeyword(photo, keyword)
+   return containsInKeywordArray(keyword, photo:getRawMetadata('keywords'));
+end
+
 local function getOtherKeywords(photo, keywords)
    local ret = {}
 
    local photoKeywords = photo:getRawMetadata('keywords');
    for _, k in ipairs(photoKeywords) do
-      if not contains(k:getName(), keywords) then
+      if not containsInStringArray(k:getName(), keywords) then
          ret[#ret + 1] = k:getName()
       end
    end
@@ -69,6 +88,11 @@ local function makeWindow(catalog, photos, json)
       local cs = result['result']['tag']['classes'];
    end
 
+   local prefs = LrPrefs.prefsForPlugin();
+   local boldExistingKeywords = prefs.boldExistingKeywords;
+   local autoCheckForExistingKeywords = prefs.autoCheckForExistingKeywords;
+   local showProbability = prefs.showProbability;
+   local catalogKeywords = catalog:getKeywords();
    LrFunctionContext.callWithContext('dialogExample', function(context)
        local f = LrView.osFactory();
        local bind = LrView.bind
@@ -80,10 +104,6 @@ local function makeWindow(catalog, photos, json)
           local keywords = json['results'][i]['result']['tag']['classes']
           local probs    = json['results'][i]['result']['tag']['probs']
 
-          for j = 1, #keywords do
-             properties[makeLabel(i, j)] = hasKeyword(photo, keywords[j]);
-          end
-
           local tbl = {
              spacing = f:label_spacing(8),
              bind_to_object = properties,
@@ -93,10 +113,24 @@ local function makeWindow(catalog, photos, json)
              },
           }
 
-          for k = 1, 20 do
-             tbl[#tbl + 1] = makeCheckbox(i, k, keywords[k], probs[k])
-          end
+          for j = 1, #keywords do
+             local checkKeyword = hasKeyword(photo, keywords[j])
+             local boldKeyword = false;
 
+             if boldExistingKeywords or autoCheckForExistingKeywords then
+                local c = containsInKeywordArray(keywords[j], catalogKeywords);
+
+                if boldExistingKeywords then
+                   boldKeyword = c
+                end
+                if autoCheckForExistingKeywords then
+                   checkKeyword = c
+                end
+             end
+
+             properties[makeLabel(i, j)] = checkKeyword;
+             tbl[#tbl + 1] = makeCheckbox(i, j, keywords[j], probs[j], boldKeyword, showProbability)
+          end
 
           local otherKeywords = getOtherKeywords(photo, keywords);
           if #otherKeywords > 0 then
