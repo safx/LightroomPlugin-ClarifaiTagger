@@ -52,7 +52,7 @@ To install ClarifaiTagger, follow these steps:
 
 1. In a few seconds Clarifai Tagger window will be opened in which keywords are suggested by Clarifai.
 
-    ![](Images/ClarifaiTagger2.png)
+    ![](Images/ClarifaiTagger1.png)
 
 1. Check keywords you want to add.
 1. Click "Save" if you apply changes, or "Cancel" otherwise.
@@ -60,3 +60,15 @@ To install ClarifaiTagger, follow these steps:
 ## Preferences
 
 ![](Images/PluginManager2.png)
+
+### Tagging
+
+* **Show Existing Keywords as Bold**: uses bold face for keywords you've already added to the collection
+* **Auto Check for Existing Keywords**: makes checkboxes checked automatically for keywords you've already added to the collection
+* **Show Probability**: shows keyword's probabilities
+        ![](Images/ClarifaiTagger2.png)
+
+### Image Settings
+
+* **Image Size**: determines thumbnail size send to Clarifai
+* **Keyword Language**: determines the language of keywords received from Clarifai

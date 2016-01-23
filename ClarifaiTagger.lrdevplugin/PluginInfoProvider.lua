@@ -98,7 +98,7 @@ local function sectionsForTopOfDialog(viewFactory, properties)
             spacing = f:control_spacing(),
 
             f:checkbox {
-               title = LOC '$$$/ClarifaiTagger/Preferences/BoldExistingKeywords=Bold Existing Keywords',
+               title = LOC '$$$/ClarifaiTagger/Preferences/BoldExistingKeywords=Show Existing Keywords as Bold',
                value = bind 'boldExistingKeywords'
             },
          },
