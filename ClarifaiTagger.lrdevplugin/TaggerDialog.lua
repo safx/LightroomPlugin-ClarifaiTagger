@@ -10,6 +10,9 @@ local LrPrefs = import 'LrPrefs'
 local LrTasks = import 'LrTasks'
 local LrView = import "LrView"
 local ClarifaiAPI = require 'ClarifaiAPI'
+local catalogKeywordNames = {}
+local catalogKeywords = {}
+local catalogKeywordPaths = {}
 
 local logger = LrLogger('ClarifaiAPI')
 logger:enable('print')
@@ -22,9 +25,17 @@ end
 
 local function makeCheckbox(i, j, keyword, prob, boldKeywords, showProbability)
    local f = LrView.osFactory();
+   -- Tooltip should show the hierarchical level of a keyword
+   local tt = ''
+   if catalogKeywordPaths[keyword] and catalogKeywordPaths[keyword] == '' then
+       tt = '(In the keyword root level)'
+   elseif catalogKeywordPaths[keyword] ~= nil then
+       tt = '(In ' .. catalogKeywordPaths[keyword] .. ')'
+   end
 
    local checkbox = {
       title = keyword,
+      tooltip = tt,
       value = LrView.bind(makeLabel(i, j)),
    }
 
@@ -45,88 +56,144 @@ local function makeCheckbox(i, j, keyword, prob, boldKeywords, showProbability)
    }
 end
 
-local function containsInStringArray(keyword, keywords)
-   for _, k in ipairs(keywords) do
-      if k == keyword then
-         return true
+-- Check simple table for a given value's presence
+local function inTable (val, t)
+   if type(t) ~= "table" then
+      return false
+   else
+      for _, tval in pairs(t) do
+         if val == tval then return true end
       end
    end
-
    return false
 end
 
-local function containsInKeywordArray(keyword, keywords)
-   for _, k in ipairs(keywords) do
-      if k:getName() == keyword then
-         return true
+--General Lightroom API helper functions for keywords
+function getKeywordByName(keyname, keywordSet)
+   for i, kw in pairs(keywordSet) do
+     -- If we have found the keyword we want, return it:
+      if string.lower(kw:getName()) == string.lower(keyname) then
+         return kw
+        -- Otherwise, use recursion to check next level if kw has child keywords:
+      else
+         local kids = kw:getChildren()
+         if kids and #kids > 0 then
+            nextkw = getKeywordByName(lookfor, kids)
+            if nextkw ~= nil then
+               return nextkw
+            end
+         end
       end
    end
-
-   return false
+    -- If we have not returned the sought keyword, it's not there:
+   return nil
 end
 
+-- Given a set of keywords (normally starting with a top level of a hierarchy),
+-- get all keywords in the set with any child/descendant keywords) and populate
+-- our three top-level variables with data we can quickly use.
+function findAllKeywords(keywords, kpath)
+   kpath = kpath or ''
+   for _, kw in pairs(keywords) do
+      name = string.lower(kw:getName())
+      catalogKeywordNames[#catalogKeywordNames + 1] = name
+      catalogKeywords[name] = kw
+      catalogKeywordPaths[name] = kpath
+      kids = kw:getChildren()
+      if kids and #kids > 0 then
+         local new_kpath = kpath .. '/' .. name
+         findAllKeywords(kids, new_kpath)
+      end
+   end
+end
+
+-- Check if photo already has a particular keyword (by name)
 local function hasKeyword(photo, keyword)
-   return containsInKeywordArray(keyword, photo:getRawMetadata('keywords'));
+   local photoKeywordList = string.lower(photo:getFormattedMetadata('keywordTags'))
+   local photoKeywordTable = split(photoKeywordList, ', ')
+   return inTable(keyword, photoKeywordTable)
 end
 
-local function getOtherKeywords(photo, keywords)
-   local ret = {}
-
-   local photoKeywords = photo:getRawMetadata('keywords');
-   for _, k in ipairs(photoKeywords) do
-      if not containsInStringArray(k:getName(), keywords) then
-         ret[#ret + 1] = k:getName()
-      end
+-- Given a string and delimiter (e.g. ', '), break the string into parts and return as table
+-- This works like PHP's explode() function.
+function split(s, delim)
+   if (delim == '') then return false end
+   local pos = 0
+   local t = {}
+   -- For each delimiter found, add to return table
+   for st, sp in function() return string.find(s, delim, pos, true) end do
+      -- Get chars to next delimiter and insert in return table
+      t[#t + 1] = string.sub(s, pos, st - 1)
+      -- Move past the delimiter
+      pos = sp + 1
    end
-
-   return ret
+   -- Get chars after last delimiter and insert in return table
+   t[#t + 1] = string.sub(s, pos)
+   
+   return t
 end
+
+-- Get existing keywords for the photo which were not part of the Clarifai response
+local function getOtherKeywords(photo, keywords)
+    photoKeywordList = string.lower(photo:getFormattedMetadata('keywordTags'))
+    local photoKeywords = split(photoKeywordList, ', ')
+    local ret = {}
+    
+    for _, k in ipairs(photoKeywords) do
+        if not inTable(k, keywords) then
+            ret[#ret + 1] = k
+        end
+    end
+    return ret
+end
+
 
 local function makeWindow(catalog, photos, json)
    local results = json['results']
    for _, result  in ipairs(results) do
-      local cs = result['result']['tag']['classes'];
+      local cs = result['result']['tag']['classes']
    end
 
    local prefs = LrPrefs.prefsForPlugin();
-   local boldExistingKeywords = prefs.boldExistingKeywords;
-   local autoCheckForExistingKeywords = prefs.autoCheckForExistingKeywords;
-   local showProbability = prefs.showProbability;
-   local catalogKeywords = catalog:getKeywords();
+   local boldExistingKeywords = prefs.boldExistingKeywords
+   local autoCheckForExistingKeywords = prefs.autoCheckForExistingKeywords
+   local showProbability = prefs.showProbability
+
    LrFunctionContext.callWithContext('dialogExample', function(context)
-       local f = LrView.osFactory();
-       local bind = LrView.bind
+      local f = LrView.osFactory()
+      local bind = LrView.bind
 
-       local properties = LrBinding.makePropertyTable(context);
+      local properties = LrBinding.makePropertyTable(context);
 
-       local columns = {}
-       for i, photo in ipairs(photos) do
-          local keywords = json['results'][i]['result']['tag']['classes']
-          local probs    = json['results'][i]['result']['tag']['probs']
+      local columns = {}
+      for i, photo in ipairs(photos) do
+         local keywords = json['results'][i]['result']['tag']['classes']
+         local probs    = json['results'][i]['result']['tag']['probs']
 
-          local tbl = {
-             spacing = f:label_spacing(8),
-             bind_to_object = properties,
-             f:catalog_photo {
-                width = thumbnailViewSize,
-                photo = photo,
-             },
-          }
+         local tbl = {
+            spacing = f:label_spacing(8),
+            bind_to_object = properties,
+            f:catalog_photo {
+               width = thumbnailViewSize,
+               photo = photo,
+            },
+         }
 
-          for j = 1, #keywords do
-             local checkKeyword = hasKeyword(photo, keywords[j])
-             local boldKeyword = false;
+         for j = 1, #keywords do
+            -- Make sure we are selecting checkboxes for keywords already on a photo:
+            local checkKeyword = hasKeyword(photo, keywords[j])
+            local boldKeyword = false;
 
-             if boldExistingKeywords or autoCheckForExistingKeywords then
-                local c = containsInKeywordArray(keywords[j], catalogKeywords);
+            if boldExistingKeywords or autoCheckForExistingKeywords then
+               local c = catalogKeywords[keywords[j]] and true or false
 
-                if boldExistingKeywords then
-                   boldKeyword = c
+                    if boldExistingKeywords then
+                    boldKeyword = c
                 end
                 if autoCheckForExistingKeywords then
-                   checkKeyword = c
+                    checkKeyword = c
                 end
-             end
+            end
 
              properties[makeLabel(i, j)] = checkKeyword;
              tbl[#tbl + 1] = makeCheckbox(i, j, keywords[j], probs[j], boldKeyword, showProbability)
@@ -172,7 +239,10 @@ local function makeWindow(catalog, photos, json)
                       local k = keywords[j];
                       local v = properties[makeLabel(i, j)];
                       if v ~= hasKeyword(photo, k) then
-                         local keyword = catalog:createKeyword(k, {}, false, nil, true);
+                         local keyword = catalogKeywords[k] 
+                         if keyword == nil then
+                             keyword = catalog:createKeyword(k, {}, false, nil, true)
+                         end
                          if keyword == false then -- This keyword was created in the current withWriteAccessDo block, so we can't get by using `returnExisting`.
                             keyword = newKeywords[k];
                          else
@@ -259,6 +329,11 @@ LrTasks.startAsyncTask(function()
                 LrDialogs.showBezel(message, 2);
 
                 local json = ClarifaiAPI.getTags(photos, thumbnailPaths);
+                
+                --While the request is being processed is a good time to parse the keyword catalog:
+                local topLevelKeys = catalog:getKeywords()
+                -- Populate the catalogKeywordNames and catalogKeywords tables
+                findAllKeywords(topLevelKeys)
                 makeWindow(catalog, photos, json);
 
                 for _, thumbnailPath in ipairs(thumbnailPaths) do
