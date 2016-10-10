@@ -30,7 +30,7 @@ local function sectionsForTopOfDialog(viewFactory, properties)
    properties.imageSize = getOrDefault(tonumber(prefs.imageSize), 400);
    properties.keywordLanguage = getOrDefault(prefs.keywordLanguage, '');
    properties.boldExistingKeywords = getOrDefault(prefs.boldExistingKeywords, true);
-   properties.autoCheckForExistingKeywords = getOrDefault(prefs.autoCheckForExistingKeywords, true);
+   properties.autoSelectExistingKeywords = getOrDefault(prefs.autoSelectExistingKeywords, true);
    properties.showProbability = getOrDefault(prefs.showProbability, false);
 
    return {
@@ -106,8 +106,8 @@ local function sectionsForTopOfDialog(viewFactory, properties)
             spacing = f:control_spacing(),
 
             f:checkbox {
-               title = LOC '$$$/ClarifaiTagger/Preferences/AutoCheckForExistingKeywords=Auto Check for Existing Keywords',
-               value = bind 'autoCheckForExistingKeywords'
+               title = LOC '$$$/ClarifaiTagger/Preferences/autoSelectExistingKeywords=Auto Check for Existing Keywords',
+               value = bind 'autoSelectExistingKeywords'
             },
          },
          f:row {
@@ -232,7 +232,7 @@ local function endDialog(properties)
    prefs.imageSize = tonumber(properties.imageSize);
    prefs.keywordLanguage = trim(properties.keywordLanguage);
    prefs.boldExistingKeywords = properties.boldExistingKeywords;
-   prefs.autoCheckForExistingKeywords = properties.autoCheckForExistingKeywords;
+   prefs.autoSelectExistingKeywords = properties.autoSelectExistingKeywords;
    prefs.showProbability = properties.showProbability;
 end
 

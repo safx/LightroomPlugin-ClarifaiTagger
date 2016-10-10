@@ -135,7 +135,7 @@ end
 
 -- Get existing keywords for the photo which were not part of the Clarifai response
 local function getOtherKeywords(photo, keywords)
-    photoKeywordList = string.lower(photo:getFormattedMetadata('keywordTags'))
+    photoKeywordList = photo:getFormattedMetadata('keywordTags'))
     local photoKeywords = split(photoKeywordList, ', ')
     local ret = {}
     
@@ -156,7 +156,7 @@ local function makeWindow(catalog, photos, json)
 
    local prefs = LrPrefs.prefsForPlugin();
    local boldExistingKeywords = prefs.boldExistingKeywords
-   local autoCheckForExistingKeywords = prefs.autoCheckForExistingKeywords
+   local autoSelectExistingKeywords = prefs.autoSelectExistingKeywords
    local showProbability = prefs.showProbability
 
    LrFunctionContext.callWithContext('dialogExample', function(context)
@@ -181,21 +181,21 @@ local function makeWindow(catalog, photos, json)
 
          for j = 1, #keywords do
             -- Make sure we are selecting checkboxes for keywords already on a photo:
-            local checkKeyword = hasKeyword(photo, keywords[j])
+            local selectKeyword = hasKeyword(photo, keywords[j])
             local boldKeyword = false;
 
-            if boldExistingKeywords or autoCheckForExistingKeywords then
+            if boldExistingKeywords or autoSelectExistingKeywords then
                local c = catalogKeywords[keywords[j]] and true or false
 
                     if boldExistingKeywords then
                     boldKeyword = c
                 end
-                if autoCheckForExistingKeywords then
-                    checkKeyword = c
+                if autoSelectExistingKeywords then
+                    selectKeyword = c
                 end
             end
 
-             properties[makeLabel(i, j)] = checkKeyword;
+             properties[makeLabel(i, j)] = selectKeyword;
              tbl[#tbl + 1] = makeCheckbox(i, j, keywords[j], probs[j], boldKeyword, showProbability)
           end
 
