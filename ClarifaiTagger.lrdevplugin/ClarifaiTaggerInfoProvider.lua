@@ -15,34 +15,38 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
 
          viewFactory:row {
             spacing = viewFactory:label_spacing(),
-            tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
 
             viewFactory:static_text {
+               tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
                title = LOC '$$$/ClarifaiTagger/Settings/ClientId=Client ID:',
                alignment = 'right',
-               width = share 'title_width',
+               -- width = share 'title_width',
             },
 
             viewFactory:edit_field {
+               tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
                fill_horizonal = 1,
                width_in_chars = 35,
+               alignment = 'left',
                value = bind { key = 'clientId', object = prefs },
             },
          },
 
          viewFactory:row {
             spacing = viewFactory:label_spacing(),
-            tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
 
             viewFactory:static_text {
+               tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
                title = LOC '$$$/ClarifaiTagger/Settings/clientSecret=Client Secret:',
                alignment = 'right',
-               width = share 'title_width',
+               -- width = share 'title_width',
             },
 
             viewFactory:edit_field {
+               tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
                fill_horizonal = 1,
                width_in_chars = 35,
+               alignment = 'left',
                value = bind { key = 'clientSecret', object = prefs },
             },
          },
@@ -53,18 +57,19 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
             viewFactory:static_text {
                title = LOC '$$$/ClarifaiTagger/Settings/AccessToken=Access Token:',
                alignment = 'right',
-               width = share 'title_width',
+               -- width = share 'title_width',
             },
 
             viewFactory:edit_field {
                fill_horizonal = 1,
                width_in_chars = 35,
+               alignment = 'left',
                enabled = false,
                value = bind { key = 'accessToken', object = prefs },
             },
          },
 
-         viewFactory:separator { fill_horizontal = 1 },
+         -- viewFactory:separator { fill_horizontal = 1 },
       },
 
       {
@@ -90,11 +95,12 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
          },
          -- Probability threshold (only used if autoSelectExistingKeywords is turned on.)
          viewFactory:row {
-            spacing = viewFactory:control_spacing(),
+            -- spacing = viewFactory:control_spacing(),
+            spacing = viewFactory:label_spacing(),
 
             viewFactory:static_text {
                title = LOC '$$$/ClarifaiTagger/Settings/autoSelectProbabilityThreshold=Probability threshold for auto-selection:',
-               alignment = 'right',
+               alignment = 'left',
                width = share 'title_width',
             },
 
@@ -102,16 +108,18 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
                min = 1,
                max = 99,
                integral = true,
+               alignment = 'left',
                value = bind { key = 'autoSelectProbabilityThreshold', object = prefs },
             },
 
             viewFactory:edit_field {
                fill_horizonal = 1,
-               width_in_chars = 4,
+               width_in_chars = 2,
                min = 1,
                max = 99,
                increment = 1,
                precision = 0,
+               alignment = 'left',
                tooltip = 'Setting for what level of Clarifai-rated probability is required for a keyword to be auto-selected.\n\nIgnored unless the "Auto-Select existing keywords" setting is selected.',
                value = bind { key = 'autoSelectProbabilityThreshold', object = prefs },
             },
@@ -131,17 +139,18 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
             spacing = viewFactory:label_spacing(),
 
             viewFactory:static_text {
-               title = LOC '$$$/ClarifaiTagger/Settings/ignoreKeywordTreeBranches=Ignore keywords or sub-branches (separate terms with commas):',
-               tooltip = 'You can enter keywords for branches (or sub-branches) of a hierarchical tree which include terms you wish to ignore, e.g. terms which would not be appropriate or would never be returned by the tool. Appropriate use can improve performance and accuracy of resulting tagging.',
-               alignment = 'right',
+               title = LOC '$$$/ClarifaiTagger/Settings/ignoreKeywordTreeBranches=Ignore keywords branches:',
+               tooltip = 'Comma-separated list of keyword terms to ignore (including chilren and descendants).',
+               alignment = 'left',
                width = share 'title_width',
             },
 
             viewFactory:edit_field {
-               tooltip = 'You can enter keywords for branches (or sub-branches) of a hierarchical tree which include terms you wish to ignore, e.g. terms which would not be appropriate or would never be returned by the tool. Appropriate use can improve performance and accuracy of resulting tagging.',
-               width_in_chars = 60,
-               height_in_lines = -1,
+               tooltip = 'Comma-separated list of keyword terms to ignore (including chilren and descendants).',
+               width_in_chars = 35,
+               height_in_lines = 4,
                enabled = true,
+               alignment = 'left',
                value = bind { key = 'ignoreKeywordTreeBranches', object = prefs },
             },
          },
@@ -155,7 +164,7 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
 
             viewFactory:static_text {
                title = LOC '$$$/ClarifaiTagger/Settings/imageSize=Image size:',
-               alignment = 'right',
+               alignment = 'left',
                width = share 'title_width',
             },
 
@@ -163,6 +172,8 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
                min = 224,
                max = 1024,
                integral = true,
+               alignment = 'left',
+               tooltip = 'Allowable range 224 to 1024 pixels. Higher values use more bandwidth, but may deliver more accurate results.',
                value = bind { key = 'imageSize', object = prefs },
             },
 
@@ -173,6 +184,7 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
                max = 1024,
                increment = 1,
                precision = 0,
+               alignment = 'left',
                tooltip = 'Allowable range 224 to 1024 pixels. Higher values use more bandwidth, but may deliver more accurate results.',
                value = bind { key = 'imageSize', object = prefs },
             },
@@ -193,7 +205,7 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
 
             viewFactory:static_text {
                title = LOC '$$$/ClarifaiTagger/Settings/keywordLanguage=Keyword language:',
-               alignment = 'right',
+               alignment = 'left',
                width = share 'title_width',
             },
 
@@ -239,10 +251,11 @@ function ClarifaiTaggerInfoProvider.sectionsForBottomOfDialog(viewFactory, prope
          viewFactory:static_text {
             title = LOC '$$$/ClarifaiTagger/Settings/simpleJSON=Simple JSON',
          },
-         viewFactory:static_text {
+         viewFactory:edit_field {
             width_in_chars = 80,
             height_in_lines = 9,
-            title = simpleJsonAcknowledgement
+            enabled = false,
+            value = simpleJsonAcknowledgement
          }
       }
    }

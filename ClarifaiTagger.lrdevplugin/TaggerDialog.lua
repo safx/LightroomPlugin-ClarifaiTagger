@@ -225,10 +225,10 @@ local function makeWindow(catalog, photos, json)
             local selectKeyword = hasKeywordByName(photo, keywords[j])
             
             local boldKeyword = false;
+            local kwExists = (keywordExists(keywords[j]) ~= false) and true or false
 
             if boldExistingKeywords or autoSelectExistingKeywords then
                -- Does the keyword list include the keyword
-               local kwExists = keywordExists(keywords[j])
                if boldExistingKeywords then
                   boldKeyword = kwExists
                end
@@ -240,12 +240,7 @@ local function makeWindow(catalog, photos, json)
             end
             if numKeysByName ~= false then
                for k=1, numKeysByName do
-                  if numKeysByName > 1 then
-                     local keyword = catalogKeywords[lowerkey][k]
-                     -- For these rare instances, de-select if multiple keywords by name and actual keyword represented by checkbox is not already selected.
-                     selectKeyword = hasKeywordById(photo, keyword)
-                  end
-                  
+                  local keyword = catalogKeywords[lowerkey][k]
                   properties[getCheckboxLabel(i, j, k)] = selectKeyword
                   tbl[#tbl + 1] = makeCheckbox(i, j, k, keywords[j], probs[j], boldKeyword, showProbability)
                end
@@ -284,8 +279,6 @@ local function makeWindow(catalog, photos, json)
          title = LOC '$$$/ClarifaiTagger/TaggerWindow/Title=Clarifai Tagger',
          contents = contents,
          actionVerb = 'Save',
-          --resizable = true,
-          --save_frame = true,
       })
 
       if result == 'ok' then
