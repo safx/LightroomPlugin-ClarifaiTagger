@@ -1,6 +1,6 @@
 -- Provide initial default values for plugin preferences.
 
-local LrPrefs = import 'LrPrefs'
+local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
 
 local defaultPrefValues = {
     clientId = 'Copy from application on Clarifai.com',
@@ -14,7 +14,6 @@ local defaultPrefValues = {
     ignoreKeywordTreeBranches = '',
 }
 
-local prefs = LrPrefs.prefsForPlugin(_PLUGIN.id)
 for k,v in pairs(defaultPrefValues) do
   if prefs[k] == nil then prefs[k] = v end
 end

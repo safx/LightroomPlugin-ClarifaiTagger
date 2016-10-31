@@ -156,7 +156,8 @@ local function getOtherKeywords(photo, keywords)
 end
 
 -- Get number of keywords by a given name (adjusted to lower case) or false
--- if the keyword does not exist.
+-- if the keyword does not exist. This functionality depends on first running
+-- findAllKeywords() to populate the catalogKeywords table.
 local function keywordExists(keyword)
    if catalogKeywords[string.lower(keyword)] ~= nil then
       return #catalogKeywords[string.lower(keyword)]
@@ -176,13 +177,23 @@ local function hasKeywordById(photo, keyword)
    return false
 end
 
+
+local function addKeywordWithParents(photo, keyword)
+   photo:addKeyword(keyword)
+   parent = keyword:getParent() 
+   if parent ~= nil then
+      addKeywordWithParents(photo, parent)
+   end
+end
+
 -- Add or remove a keyword based on the "state" of the associated checkbox.
 -- Presumed is that we call this when the state differs from what is already on this image,
 -- i.e. that they keyword is being changed for the photo (added or removed)
 local function addOrRemoveKeyword(photo, keyword, state)
    if state then
-      photo:addKeyword(keyword)
+      addKeywordWithParents(photo, keyword)
    else
+      -- We cannot assume parents should be removed if already there.
       photo:removeKeyword(keyword)
    end
 end
