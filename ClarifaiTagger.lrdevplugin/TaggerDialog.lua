@@ -10,6 +10,9 @@ local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
 local LrTasks = import 'LrTasks'
 local LrView = import "LrView"
 local ClarifaiAPI = require 'ClarifaiAPI'
+local KwUtils = require 'KwUtils'
+local LUTILS = require 'LUTILS'
+
 local catalogKeywords = {}
 local catalogKeywordPaths = {}
 
@@ -20,31 +23,6 @@ logger:enable('print')
 -- Returns a checkbox label used in the dialog. i, j, and k are normally all integers
 local function getCheckboxLabel(i, j, k)
    return 'check_' .. tostring(i) .. '_' .. tostring(j) .. '_' .. tostring(k)
-end
-
--- Given a string and delimiter (e.g. ', '), break the string into parts and return as table
--- This works like PHP's explode() function.
-local function split(s, delim)
-   if (delim == '') then return false end
-   local pos = 0
-   local t = {}
-   -- For each delimiter found, add to return table
-   for st, sp in function() return string.find(s, delim, pos, true) end do
-      -- Get chars to next delimiter and insert in return table
-      t[#t + 1] = string.sub(s, pos, st - 1)
-      -- Move past the delimiter
-      pos = sp + 1
-   end
-   -- Get chars after last delimiter and insert in return table
-   t[#t + 1] = string.sub(s, pos)
-
-   return t
-end
-
--- Remove whitespace from either end of a string
-local function trim(s)
-   if s == nil then return nil end
-   return string.gsub(s, '^%s*(.-)%s*$', '%1')
 end
 
 local function makeCheckbox(i, j, k, keyword, prob, boldKeywords, showProbability)
@@ -81,22 +59,10 @@ local function makeCheckbox(i, j, k, keyword, prob, boldKeywords, showProbabilit
    }
 end
 
--- Check simple table for a given value's presence
-local function inTable (val, t)
-   if type(t) ~= "table" then
-      return false
-   else
-      for _, tval in pairs(t) do
-         if val == tval then return true end
-      end
-   end
-   return false
-end
-
 local function getIgnoreKeywordsTable()
-   local ignoreKeysTable = split(prefs.ignoreKeywordTreeBranches, ', ')
+   local ignoreKeysTable = LUTILS.split(prefs.ignoreKeywordTreeBranches, ', ')
    for i, kw in ipairs(ignoreKeysTable) do
-      local val = trim(ignoreKeysTable[i])
+      local val = LUTILS.trim(ignoreKeysTable[i])
       if val == '' then
          ignoreKeysTable[i] = nil
       end
@@ -114,7 +80,7 @@ local function findAllKeywords(keywords, kpath)
    for _, kw in pairs(keywords) do
       local name = kw:getName()
       -- Skip any keywords (and descendants) listed in the ignoreKeysTable
-      if not inTable(name, ignoreKeysTable) then
+      if not LUTILS.inTable(name, ignoreKeysTable) then
          local keyname = string.lower(name)
          if catalogKeywords[keyname] ~= nil then
             local count = #catalogKeywords[keyname]
@@ -126,33 +92,11 @@ local function findAllKeywords(keywords, kpath)
          end
          kids = kw:getChildren()
          if kids and #kids > 0 then
-            local new_kpath = kpath .. '|' .. name
+            local new_kpath = kpath ~= '' and kpath .. '|' .. name or name
             findAllKeywords(kids, new_kpath)
          end
       end
    end
-end
-
--- Check if photo already has a particular keyword (by name)
-local function hasKeywordByName(photo, keyword)
-   local photoKeywordList = string.lower(photo:getFormattedMetadata('keywordTags'))
-   local photoKeywordTable = split(photoKeywordList, ', ')
-   return inTable(keyword, photoKeywordTable)
-end
-
--- Get existing keywords for the photo which were not part of the Clarifai response
-local function getOtherKeywords(photo, keywords)
-   photoKeywordList = photo:getFormattedMetadata('keywordTags')
-   local photoKeywords = split(photoKeywordList, ', ')
-   local ret = {}
-
-   for _, key in ipairs(photoKeywords) do
-      if not inTable(key, keywords) then
-         ret[#ret + 1] = key
-      end
-   end
-   
-   return ret
 end
 
 -- Get number of keywords by a given name (adjusted to lower case) or false
@@ -163,39 +107,6 @@ local function keywordExists(keyword)
       return #catalogKeywords[string.lower(keyword)]
    end
    return false
-end
-
--- Check for actual keyword (by keyword ID) associated with a photo
-local function hasKeywordById(photo, keyword)
-   kwid = keyword.localIdentifier
-   keywordsForPhoto = photo:getRawMetadata('keywords')
-   for _, k in pairs(keywordsForPhoto) do
-      if k.localIdentifier == kwid then
-         return true
-      end
-   end
-   return false
-end
-
-
-local function addKeywordWithParents(photo, keyword)
-   photo:addKeyword(keyword)
-   parent = keyword:getParent() 
-   if parent ~= nil then
-      addKeywordWithParents(photo, parent)
-   end
-end
-
--- Add or remove a keyword based on the "state" of the associated checkbox.
--- Presumed is that we call this when the state differs from what is already on this image,
--- i.e. that they keyword is being changed for the photo (added or removed)
-local function addOrRemoveKeyword(photo, keyword, state)
-   if state then
-      addKeywordWithParents(photo, keyword)
-   else
-      -- We cannot assume parents should be removed if already there.
-      photo:removeKeyword(keyword)
-   end
 end
 
 local function makeWindow(catalog, photos, json)
@@ -233,7 +144,7 @@ local function makeWindow(catalog, photos, json)
             local numKeysByName = catalogKeywords[lowerkey] ~= nil and #catalogKeywords[lowerkey] or false
 
             -- Make sure we are selecting checkboxes for keywords already on a photo:
-            local selectKeyword = hasKeywordByName(photo, keywords[j])
+            local selectKeyword = KwUtils.hasKeywordByName(photo, keywords[j])
             
             local boldKeyword = false;
             local kwExists = (keywordExists(keywords[j]) ~= false) and true or false
@@ -263,7 +174,7 @@ local function makeWindow(catalog, photos, json)
             end
          end
 
-         local otherKeywords = getOtherKeywords(photo, keywords)
+         local otherKeywords = KwUtils.getOtherKeywords(photo, keywords)
          if #otherKeywords > 0 then
             tbl[#tbl + 1] = f:spacer {
                height = 4
@@ -323,14 +234,14 @@ local function makeWindow(catalog, photos, json)
                         for k=1, numKeysByName do
                            local checkboxState = properties[getCheckboxLabel(i, j, k)]
                            local keyword = catalogKeywords[kwLower][k]
-                           if numKeysByName == 1 and checkboxState ~= hasKeywordByName(photo, kwName) then
-                              addOrRemoveKeyword(photo, keyword, checkboxState)
+                           if numKeysByName == 1 and checkboxState ~= KwUtils.hasKeywordByName(photo, kwName) then
+                              KwUtils.addOrRemoveKeyword(photo, keyword, checkboxState)
 
                            elseif numKeysByName > 1 then
                               -- We need to use more accurate (less performant) means to verify the actual keyword
                               -- is (or is not) already associated with the photo.
-                              if checkboxState ~= hasKeywordById(photo, keyword) then
-                                 addOrRemoveKeyword(photo, keyword, checkboxState)
+                              if checkboxState ~= KwUtils.hasKeywordById(photo, keyword) then
+                                 KwUtils.addOrRemoveKeyword(photo, keyword, checkboxState)
                               end
                            end
                         end

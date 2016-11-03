@@ -1,6 +1,7 @@
 local LrView = import 'LrView'
 
-local simpleJsonAcknowledgement = 'Simple JSON encoding and decoding in pure Lua.\n\nCopyright 2010-2014 Jeffrey Friedl\nhttp://regex.info/blog/\n\nLatest version: http://regex.info/blog/lua/json\n\nThis code is released under a Creative Commons CC-BY "Attribution" License:\nhttp://creativecommons.org/licenses/by/3.0/deed.en_US\n'
+local simpleJsonAcknowledgement = 'Simple JSON encoding and decoding in pure Lua.\n\nCopyright 2010-2014 Jeffrey Friedl\nhttp://regex.info/blog/\n\nLatest version: http://regex.info/blog/lua/json\n\nThis code is released under a Creative Commons CC-BY "Attribution" License:\nhttp://creativecommons.org/licenses/by/3.0/deed.en_US'
+
 -----------------------------------------
 local ClarifaiTaggerInfoProvider = {}
 
@@ -245,6 +246,8 @@ end
 
 
 function ClarifaiTaggerInfoProvider.sectionsForBottomOfDialog(viewFactory, propertyTable)
+   local KwUtilsAttribution = require 'KwUtils'.Attribution
+   local LutilsAttribution = require 'LUTILS'.Attribution
    return {
       {
          title = LOC '$$$/ClarifaiTagger/Settings/acknowledgements=Acknowledgements',
@@ -256,6 +259,24 @@ function ClarifaiTaggerInfoProvider.sectionsForBottomOfDialog(viewFactory, prope
             height_in_lines = 9,
             enabled = false,
             value = simpleJsonAcknowledgement
+         },
+         viewFactory:static_text {
+            title = LOC '$$$/ClarifaiTagger/Settings/KwUtils=KwUtils: Keyword Utility Functions for Lightroom',
+         },
+         viewFactory:edit_field {
+            width_in_chars = 80,
+            height_in_lines = 5,
+            enabled = false,
+            value = KwUtilsAttribution
+         },
+         viewFactory:static_text {
+            title = LOC '$$$/ClarifaiTagger/Settings/Lutils=LUTILS: Lua Utility Functions for Lightroom',
+         },
+         viewFactory:edit_field {
+            width_in_chars = 80,
+            height_in_lines = 5,
+            enabled = false,
+            value = LutilsAttribution
          }
       }
    }
