@@ -22,7 +22,7 @@ Utility functions for Lightroom Keywords
 local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
 local LUTILS = require 'LUTILS'
 
-KwUtils = {}
+local KwUtils = {}
 
 KwUtils.VERSION = 20161101.01 -- version history at end of file
 KwUtils.AUTHOR_NOTE = "KwUtils.lua is a set of Lightroom keyword utility functions, © 2016 by Lowell Montgomery (https://lowemo.photo/lightroom-keyword-utils) version: " .. KwUtils.VERSION
@@ -111,7 +111,7 @@ end
 function KwUtils.getKeywordNames(keywords)  
     local names = {}
     for i, kw in pairs(keywords) do
-       names[#names +1] = kw:getName() 
+        names[#names +1] = kw:getName() 
     end
     return names;
 end
@@ -127,7 +127,7 @@ function KwUtils.getOtherKeywords(photo, keywords)
             ret[#ret + 1] = key
         end
     end
-   
+
     return ret
 end
 
