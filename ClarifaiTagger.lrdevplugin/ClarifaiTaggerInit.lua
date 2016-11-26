@@ -11,7 +11,7 @@ local defaultPrefValues = {
     autoSelectExistingKeywords = true,
     showProbability = false,
     autoSelectProbabilityThreshold = 85,
-    ignoreKeywordTreeBranches = '',
+    ignore_keyword_branches = '',
 }
 
 for k,v in pairs(defaultPrefValues) do

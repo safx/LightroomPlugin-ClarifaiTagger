@@ -140,7 +140,7 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
             spacing = viewFactory:label_spacing(),
 
             viewFactory:static_text {
-               title = LOC '$$$/ClarifaiTagger/Settings/ignoreKeywordTreeBranches=Ignore keywords branches:',
+               title = LOC '$$$/ClarifaiTagger/Settings/ignore_keyword_branches=Ignore keywords branches:',
                tooltip = 'Comma-separated list of keyword terms to ignore (including chilren and descendants).',
                alignment = 'left',
                width = share 'title_width',
@@ -152,7 +152,7 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
                height_in_lines = 4,
                enabled = true,
                alignment = 'left',
-               value = bind { key = 'ignoreKeywordTreeBranches', object = prefs },
+               value = bind { key = 'ignore_keyword_branches', object = prefs },
             },
          },
       },

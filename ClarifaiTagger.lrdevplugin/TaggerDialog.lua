@@ -1,3 +1,7 @@
+local Require = require 'Require'.path ("../../debugscript.lrdevplugin")
+local Debug = require 'Debug'.init ()
+require 'strict'
+
 local LrApplication = import 'LrApplication'
 local LrBinding = import "LrBinding"
 local LrColor = import 'LrColor'
@@ -13,9 +17,6 @@ local ClarifaiAPI = require 'ClarifaiAPI'
 local KwUtils = require 'KwUtils'
 local LUTILS = require 'LUTILS'
 
-local catalogKeywords = {}
-local catalogKeywordPaths = {}
-
 local logger = LrLogger('ClarifaiAPI')
 logger:enable('print')
 
@@ -30,10 +31,10 @@ local function makeCheckbox(i, j, k, keyword, prob, boldKeywords, showProbabilit
    -- Tooltip should show the hierarchical level of a keyword
    local tt = ''
    local lowerkey = string.lower(keyword)
-   if catalogKeywordPaths[lowerkey] and catalogKeywordPaths[lowerkey][k] == '' then
+   if KwUtils.catKwPaths[lowerkey] and KwUtils.catKwPaths[lowerkey][k] == '' then
        tt = '(In the keyword root level)'
-   elseif catalogKeywordPaths[lowerkey] ~= nil then
-       tt = '(In ' .. catalogKeywordPaths[lowerkey][k] .. ')'
+   elseif KwUtils.catKwPaths[lowerkey] ~= nil then
+       tt = '(In ' .. KwUtils.catKwPaths[lowerkey][k] .. ')'
    end
 
    local checkbox = {
@@ -59,56 +60,6 @@ local function makeCheckbox(i, j, k, keyword, prob, boldKeywords, showProbabilit
    }
 end
 
-local function getIgnoreKeywordsTable()
-   local ignoreKeysTable = LUTILS.split(prefs.ignoreKeywordTreeBranches, ', ')
-   for i, kw in ipairs(ignoreKeysTable) do
-      local val = LUTILS.trim(ignoreKeysTable[i])
-      if val == '' then
-         ignoreKeysTable[i] = nil
-      end
-   end
-   
-   return ignoreKeysTable
-end
-
--- Given a set of keywords (normally starting with a top level of a hierarchy),
--- get all keywords in the set with any child/descendant keywords) and populate
--- our top-level keyword table variables with data we can quickly use.
-local function findAllKeywords(keywords, kpath)
-   kpath = kpath or ''
-   local ignoreKeysTable = getIgnoreKeywordsTable()
-   for _, kw in pairs(keywords) do
-      local name = kw:getName()
-      -- Skip any keywords (and descendants) listed in the ignoreKeysTable
-      if not LUTILS.inTable(name, ignoreKeysTable) then
-         local keyname = string.lower(name)
-         if catalogKeywords[keyname] ~= nil then
-            local count = #catalogKeywords[keyname]
-            catalogKeywords[keyname][count + 1] = kw
-            catalogKeywordPaths[keyname][count + 1] = kpath
-         else
-            catalogKeywords[keyname] = {kw}
-            catalogKeywordPaths[keyname] = {kpath}
-         end
-         kids = kw:getChildren()
-         if kids and #kids > 0 then
-            local new_kpath = kpath ~= '' and kpath .. '|' .. name or name
-            findAllKeywords(kids, new_kpath)
-         end
-      end
-   end
-end
-
--- Get number of keywords by a given name (adjusted to lower case) or false
--- if the keyword does not exist. This functionality depends on first running
--- findAllKeywords() to populate the catalogKeywords table.
-local function keywordExists(keyword)
-   if catalogKeywords[string.lower(keyword)] ~= nil then
-      return #catalogKeywords[string.lower(keyword)]
-   end
-   return false
-end
-
 local function makeWindow(catalog, photos, json)
    local results = json['results']
    for _, result  in ipairs(results) do
@@ -119,7 +70,7 @@ local function makeWindow(catalog, photos, json)
    local autoSelectExistingKeywords = prefs.autoSelectExistingKeywords
    local showProbability = prefs.showProbability
 
-   LrFunctionContext.callWithContext('dialogExample', function(context)
+   LrFunctionContext.callWithContext('showDialog', Debug.showErrors(function(context)
       local f = LrView.osFactory()
       local bind = LrView.bind
 
@@ -134,20 +85,20 @@ local function makeWindow(catalog, photos, json)
             spacing = f:label_spacing(8),
             bind_to_object = properties,
             f:catalog_photo {
-               width = thumbnailViewSize,
+               width = 300,
                photo = photo,
             },
          }
 
          for j = 1, #keywords do
             local lowerkey = string.lower(keywords[j])
-            local numKeysByName = catalogKeywords[lowerkey] ~= nil and #catalogKeywords[lowerkey] or false
+            local numKeysByName = KwUtils.catKws[lowerkey] ~= nil and #KwUtils.catKws[lowerkey] or false
 
             -- Make sure we are selecting checkboxes for keywords already on a photo:
             local selectKeyword = KwUtils.hasKeywordByName(photo, keywords[j])
             
             local boldKeyword = false;
-            local kwExists = (keywordExists(keywords[j]) ~= false) and true or false
+            local kwExists = (KwUtils.keywordExists(keywords[j]) ~= false) and true or false
 
             if boldExistingKeywords or autoSelectExistingKeywords then
                -- Does the keyword list include the keyword
@@ -162,7 +113,7 @@ local function makeWindow(catalog, photos, json)
             end
             if numKeysByName ~= false then
                for k=1, numKeysByName do
-                  local keyword = catalogKeywords[lowerkey][k]
+                  local keyword = KwUtils.catKws[lowerkey][k]
                   properties[getCheckboxLabel(i, j, k)] = selectKeyword
                   tbl[#tbl + 1] = makeCheckbox(i, j, k, keywords[j], probs[j], boldKeyword, showProbability)
                end
@@ -211,7 +162,7 @@ local function makeWindow(catalog, photos, json)
                   for j = 1, #keywords do
                      local kwName = keywords[j]
                      local kwLower = string.lower(kwName)
-                     local keywordsByName = catalogKeywords[kwLower]
+                     local keywordsByName = KwUtils.catKws[kwLower]
                      local numKeysByName = keywordsByName ~= nil and #keywordsByName or 0
 
                      -- First deal with the issue of adding a keyword that was not in the Lightroom library before:
@@ -233,7 +184,7 @@ local function makeWindow(catalog, photos, json)
                      else 
                         for k=1, numKeysByName do
                            local checkboxState = properties[getCheckboxLabel(i, j, k)]
-                           local keyword = catalogKeywords[kwLower][k]
+                           local keyword = KwUtils.catKws[kwLower][k]
                            if numKeysByName == 1 and checkboxState ~= KwUtils.hasKeywordByName(photo, kwName) then
                               KwUtils.addOrRemoveKeyword(photo, keyword, checkboxState)
 
@@ -250,7 +201,7 @@ local function makeWindow(catalog, photos, json)
                end
          end )
       end
-   end )
+   end ))
 end
 
 local function requestJpegThumbnails(target_photos, processed_photos, generated_thumbnails, callback)
@@ -285,7 +236,7 @@ end
 
 local thumbnailDir = LrPathUtils.getStandardFilePath('temp')
 
-LrTasks.startAsyncTask(function()
+LrTasks.startAsyncTask(Debug.showErrors(function()
       local catalog = LrApplication.activeCatalog()
       local photos = reverseArray(catalog:getTargetPhotos())
 
@@ -319,11 +270,10 @@ LrTasks.startAsyncTask(function()
                 LrDialogs.showBezel(message, 2)
 
                 local json = ClarifaiAPI.getTags(photos, thumbnailPaths)
-                
-                --While the request is being processed is a good time to parse the keyword catalog:
-                local topLevelKeys = catalog:getKeywords()
-                -- Populate the catalogKeywordNames and catalogKeywords tables
-                findAllKeywords(topLevelKeys)
+
+                -- Populate the KwUtils.catKws and KwUtils.catKwPaths tables
+                local allKeys = KwUtils.getAllKeywords(catalog)
+                Debug.lognpp("All keywords", allKeys)
                 makeWindow(catalog, photos, json)
 
                 for _, thumbnailPath in ipairs(thumbnailPaths) do
@@ -331,4 +281,4 @@ LrTasks.startAsyncTask(function()
                 end
           end )
       end )
-end )
+end))

@@ -19,12 +19,13 @@ Utility functions for Lightroom Keywords
     strings, below are maintained. Enjoy.
 ------------------------------------------------------------------------------]]
 
-local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
 local LUTILS = require 'LUTILS'
 
-local KwUtils = {}
+KwUtils = {}
+KwUtils.catKws = nil
+KwUtils.catKwPaths = nil
 
-KwUtils.VERSION = 20161122.02 -- version history at end of file
+KwUtils.VERSION = 20161126.03 -- version history at end of file
 KwUtils.AUTHOR_NOTE = "KwUtils.lua is a set of Lightroom keyword utility functions, © 2016 by Lowell Montgomery (https://lowemo.photo/lightroom-keyword-utils) version: " .. KwUtils.VERSION
 
 -- The following provides an 80 character-width attribution text that can be inserted for display
@@ -101,7 +102,7 @@ function KwUtils.getAllKeywordsByName(name, keywords, found)
     end
     for i, kw in pairs(keywords) do
         -- If we have found the keyword we want, return it:
-        if kw:getName() == name and kwInTable(kw, found) == false then
+        if kw:getName() == name and LUTILS.inTable(kw, found) == false then
             found[#found + 1] = kw
         -- Otherwise, use recursion to check next level if kw has child keywords:
         else
@@ -184,6 +185,80 @@ function KwUtils.getKeywordNames(keywords)
     return names
 end
 
+
+-- This is used by the KwUtils.findAllKeywords and allows skipping over branches that
+-- would not be helpful for whatever purpose. A plugin does not NEED to implement
+-- the ignore_keyword_branches preference. If it does not exist, we skip no branches,
+-- just as if it did exist, but the field was empty.
+function KwUtils.getIgnoreKeywordsTable()
+    local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
+    local ignoreKeywordsList = ''
+    if prefs.ignore_keyword_branches ~= nil then
+        ignoreKeywordsList = prefs.ignore_keyword_branches
+    end
+    local ignoreKeysTable = LUTILS.split(ignoreKeywordsList, ', ')
+    for i, kw in ipairs(ignoreKeysTable) do
+        local val = LUTILS.trim(kw)
+        if val == '' then
+            ignoreKeysTable[i] = nil
+        else
+            ignoreKeysTable[i] = val
+        end
+    end
+    return ignoreKeysTable
+end
+
+-- This function must be called from within an asynchronous task started using LrTasks.
+function KwUtils.getAllKeywords(catalog)
+    if KwUtils.catKws == nil then
+        KwUtils.catKws = {}
+        KwUtils.catKwPaths = {}
+        local topLevelKeywords = catalog:getKeywords()
+        return KwUtils.findAllKeywords(topLevelKeywords)
+    end
+    return KwUtils.catKws
+end
+
+-- Given a set of keywords (normally starting with a top level of a hierarchy),
+-- get all keywords in the set with any child/descendant keywords) and populate
+-- our top-level keyword table variables with data we can quickly use.
+function KwUtils.findAllKeywords(keywords, kpath)
+   kpath = kpath or ''
+   local ignoreKeysTable = KwUtils.getIgnoreKeywordsTable()
+   for _, kw in pairs(keywords) do
+      local name = kw:getName()
+      -- Skip any keywords (and descendants) listed in the ignoreKeysTable
+      if not LUTILS.inTable(name, ignoreKeysTable) then
+         local keyname = string.lower(name)
+         if KwUtils.catKws[keyname] ~= nil then
+            local count = #KwUtils.catKws[keyname]
+            KwUtils.catKws[keyname][count + 1] = kw
+            KwUtils.catKwPaths[keyname][count + 1] = kpath
+         else
+            KwUtils.catKws[keyname] = {kw}
+            KwUtils.catKwPaths[keyname] = {kpath}
+         end
+         local kids = kw:getChildren()
+         if kids and #kids > 0 then
+            local new_kpath = kpath ~= '' and kpath .. ' | ' .. name or name
+            KwUtils.findAllKeywords(kids, new_kpath)
+         end
+      end
+   end
+   return KwUtils.catKws;
+end
+
+-- Get number of keywords by a given name (adjusted to lower case) or false
+-- if the keyword does not exist. This functionality depends on first running
+-- KwUtils.findAllKeywords() to populate the catKws table.
+function KwUtils.keywordExists(keyword)
+   if KwUtils.catKws[string.lower(keyword)] ~= nil then
+      return #KwUtils.catKws[string.lower(keyword)]
+   end
+   return false
+end
+
+
 -- Get existing keywords for a photo which are not in a given set (table)
 function KwUtils.getOtherKeywords(photo, keywordNames)
     local photoKeywordList = photo:getFormattedMetadata('keywordTags')
@@ -218,3 +293,7 @@ return KwUtils
 
 -- 20161101.01 Initial release.
 --    It includes functions I had found myself writing and re-writing in various plugins.
+-- 20161122.02 Minor tweaks and bugfixes; not yet officially released, so will not itemize changes
+-- 20161126.03 Moved more logic into the KwUtils. It is no longer a local bundle, so this may have ramifications for memory
+--             etc, but allows us to call "expenive" processes (new findAllKeywords() / getAllKeywords() functionality) and
+--             hopefully be able to access the results from other scripts in a plugin. Still "pre-release"
