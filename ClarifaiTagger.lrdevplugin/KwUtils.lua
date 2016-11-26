@@ -34,7 +34,7 @@ KwUtils.Attribution = "This plugin uses KwUtils, Lightroom keyword utilities, ©
 
 function KwUtils.addKeywordWithParents(photo, keyword)
     photo:addKeyword(keyword)
-    parent = keyword:getParent()
+    local parent = keyword:getParent()
     if parent ~= nil then
         KwUtils.addKeywordWithParents(photo, parent)
     end
