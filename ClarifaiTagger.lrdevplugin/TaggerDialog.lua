@@ -237,48 +237,48 @@ end
 local thumbnailDir = LrPathUtils.getStandardFilePath('temp')
 
 LrTasks.startAsyncTask(Debug.showErrors(function()
-      local catalog = LrApplication.activeCatalog()
-      local photos = reverseArray(catalog:getTargetPhotos())
+   local catalog = LrApplication.activeCatalog()
+   local photos = reverseArray(catalog:getTargetPhotos())
 
-      local limitSize = 128 -- currently Clarifai's max_batch_size
-      if #photos > limitSize then
-         local message = LOC '$$$/ClarifaiTagger/TaggerWindow/ExceedsBatchSizeMessage=Selected photos execeeds the limit (%d).'
-         local info = LOC '$$$/ClarifaiTagger/TaggerWindow/ExceedsBatchSizeInfo=%d photos are selected currently.'
-         LrDialogs.message(string.format(message, limitSize), string.format(info, #photos), 'warning')
-         return
-      end
+   local limitSize = 128 -- currently Clarifai's max_batch_size
+   if #photos > limitSize then
+      local message = LOC '$$$/ClarifaiTagger/TaggerWindow/ExceedsBatchSizeMessage=Selected photos execeeds the limit (%d).'
+      local info = LOC '$$$/ClarifaiTagger/TaggerWindow/ExceedsBatchSizeInfo=%d photos are selected currently.'
+      LrDialogs.message(string.format(message, limitSize), string.format(info, #photos), 'warning')
+      return
+   end
 
-      requestJpegThumbnails(photos, {}, {}, function(photos, thumbnails)
-          logger:info(' thumbnail created ', #photos, #thumbnails)
-          local thumbnailPaths = {}
-          for idx, thumbnail in ipairs(thumbnails) do
-             local photo = photos[idx]
-             local filePath = photo.path -- photo:getRawMetadata('path');
-             local fileName = LrPathUtils.leafName(filePath)
-             local path = LrPathUtils.child(thumbnailDir, fileName)
-             local jpg_path = LrPathUtils.addExtension(path, 'jpg')
+   requestJpegThumbnails(photos, {}, {}, function(photos, thumbnails)
+       logger:info(' thumbnail created ', #photos, #thumbnails)
+       local thumbnailPaths = {}
+       for idx, thumbnail in ipairs(thumbnails) do
+          local photo = photos[idx]
+          local filePath = photo.path -- photo:getRawMetadata('path');
+          local fileName = LrPathUtils.leafName(filePath)
+          local path = LrPathUtils.child(thumbnailDir, fileName)
+          local jpg_path = LrPathUtils.addExtension(path, 'jpg')
 
-             local out = io.open(jpg_path, 'w')
-             io.output(out)
-             io.write(thumbnail)
-             io.close(out)
-             thumbnailPaths[#thumbnailPaths + 1] = jpg_path
-          end
+          local out = io.open(jpg_path, 'w')
+          io.output(out)
+          io.write(thumbnail)
+          io.close(out)
+          thumbnailPaths[#thumbnailPaths + 1] = jpg_path
+       end
 
-          LrTasks.startAsyncTask(function()
-                local message = LOC '$$$/ClarifaiTagger/TaggerWindow/ProcessingMessage=Sending thumbnails of the selected photos...'
-                LrDialogs.showBezel(message, 2)
+       LrTasks.startAsyncTask(function()
+             local message = LOC '$$$/ClarifaiTagger/TaggerWindow/ProcessingMessage=Sending thumbnails of the selected photos...'
+             LrDialogs.showBezel(message, 2)
 
-                local json = ClarifaiAPI.getTags(photos, thumbnailPaths)
+             local json = ClarifaiAPI.getTags(photos, thumbnailPaths)
 
-                -- Populate the KwUtils.catKws and KwUtils.catKwPaths tables
-                local allKeys = KwUtils.getAllKeywords(catalog)
-                Debug.lognpp("All keywords", allKeys)
-                makeWindow(catalog, photos, json)
+             -- Populate the KwUtils.catKws and KwUtils.catKwPaths tables
+             local allKeys = KwUtils.getAllKeywords(catalog)
+             Debug.lognpp("All keywords", allKeys)
+             makeWindow(catalog, photos, json)
 
-                for _, thumbnailPath in ipairs(thumbnailPaths) do
-                   LrFileUtils.delete(thumbnailPath)
-                end
-          end )
-      end )
+             for _, thumbnailPath in ipairs(thumbnailPaths) do
+                LrFileUtils.delete(thumbnailPath)
+             end
+       end )
+   end )
 end))
