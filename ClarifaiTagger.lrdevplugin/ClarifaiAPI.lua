@@ -1,10 +1,8 @@
 local LrHttp = import 'LrHttp'
 local LrLogger = import 'LrLogger'
 local LrPathUtils = import 'LrPathUtils'
-local LrPrefs = import 'LrPrefs'
 local JSON = require 'JSON'
-
-local prefs = LrPrefs.prefsForPlugin();
+local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
 
 local logger = LrLogger('ClarifaiAPI')
 logger:enable('print')
