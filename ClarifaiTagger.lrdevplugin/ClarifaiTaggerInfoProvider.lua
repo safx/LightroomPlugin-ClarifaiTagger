@@ -69,13 +69,113 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
                value = bind { key = 'accessToken', object = prefs },
             },
          },
-
          -- viewFactory:separator { fill_horizontal = 1 },
       },
 
       {
-         title = LOC '$$$/ClarifaiTagger/Settings/tagging=Tagging',
+         title = LOC '$$$/ClarifaiTagger/Settings/tagging=Tagging Dialog',
 
+         viewFactory:row {
+            spacing = viewFactory:control_spacing(),
+
+            viewFactory:static_text {
+               title = LOC '$$$/ClarifaiTagger/Settings/thumbnailSize=Thumbnail size (in tagging dialog)',
+               alignment = 'left',
+               width = share 'title_width',
+            },
+
+            viewFactory:slider {
+               min = 250,
+               max = 500,
+               integral = true,
+               alignment = 'left',
+               tooltip = 'Allowable range 250 to 500 pixels.',
+               value = bind { key = 'thumbnailSize', object = prefs },
+            },
+
+            viewFactory:edit_field {
+               fill_horizonal = 1,
+               width_in_chars = 3,
+               min = 250,
+               max = 500,
+               increment = 1,
+               precision = 0,
+               alignment = 'left',
+               tooltip = 'Allowable range 250 to 500 pixels. “Short side” dimension for thumbnail images shown in the tagging window',
+               value = bind { key = 'thumbnailSize', object = prefs },
+            },
+         },
+         viewFactory:row {
+            viewFactory:spacer { width = share 'title_width', height = 1 },
+
+            viewFactory:static_text {
+               title = LOC '$$$/ClarifaiTagger/Settings/ThumbnailSizeDesc=Size of tagging window thumbnail images (“short side”)',
+               alignment = 'right',
+            },
+         },
+         viewFactory:spacer { width = 1, height = 4 },
+         viewFactory:row {
+            spacing = viewFactory:control_spacing(),
+            viewFactory:static_text {
+               title = 'Tagging window width',
+               tooltip = 'Width (px) of the tagging window (range 500–3800px)',
+            },
+            viewFactory:edit_field {
+               value = bind { key = 'taggingWindowWidth', object = prefs },
+               tooltip = 'Width (px) of the tagging window (range 500–3800px)',
+               min = 500,
+               max = 3800,
+               width_in_chars = 4,
+               increment = 1,
+               precision = 0,
+            },
+            spacing = viewFactory:control_spacing(),
+            viewFactory:static_text {
+               title = 'Tagging window height',
+               tooltip = 'Height (px) of the tagging window (range 400-2100px)',
+            },
+            viewFactory:edit_field {
+               value = bind { key = 'taggingWindowHeight', object = prefs },
+               tooltip = 'Height (px) of the tagging window (range 400–2100px)',
+               min = 400,
+               max = 2100,
+               width_in_chars = 4,
+               increment = 1,
+               precision = 0,
+           }
+         },
+         viewFactory:spacer { width = 1, height = 4 },
+         viewFactory:row {
+            spacing = viewFactory:control_spacing(),
+            viewFactory:static_text {
+               title = 'Image preview window width',
+               tooltip = 'Width (px) of the image preview window (range 500–3800px)',
+            },
+            viewFactory:edit_field {
+               value = bind { key = 'imagePreviewWindowWidth', object = prefs },
+               tooltip = 'Width (px) of the image preview window (range 500–3800px)',
+               min = 500,
+               max = 3800,
+               width_in_chars = 4,
+               increment = 1,
+               precision = 0,
+            },
+            spacing = viewFactory:control_spacing(),
+            viewFactory:static_text {
+               title = 'Image preview window height',
+               tooltip = 'Height (px) of the image preview window (range 400–2100px)',
+            },
+            viewFactory:edit_field {
+               value = bind { key = 'imagePreviewWindowHeight', object = prefs },
+               tooltip = 'Height (px) of the image preview window (range 400–2100px)',
+               min = 400,
+               max = 2100,
+               width_in_chars = 4,
+               increment = 1,
+               precision = 0,
+            }
+         },         
+         viewFactory:spacer { width = 1, height = 4 },
          viewFactory:row {
             spacing = viewFactory:control_spacing(),
 
@@ -164,29 +264,29 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
             spacing = viewFactory:control_spacing(),
 
             viewFactory:static_text {
-               title = LOC '$$$/ClarifaiTagger/Settings/imageSize=Image size:',
+               title = LOC '$$$/ClarifaiTagger/Settings/imageSize=Image size (sent to Clarifai)',
                alignment = 'left',
                width = share 'title_width',
             },
 
             viewFactory:slider {
-               min = 224,
-               max = 1024,
+               min = 400,
+               max = 2000,
                integral = true,
                alignment = 'left',
-               tooltip = 'Allowable range 224 to 1024 pixels. Higher values use more bandwidth, but may deliver more accurate results.',
+               tooltip = 'Allowable range 400 to 2000 pixels. Higher values use more bandwidth, but may deliver more accurate results.',
                value = bind { key = 'imageSize', object = prefs },
             },
 
             viewFactory:edit_field {
                fill_horizonal = 1,
                width_in_chars = 4,
-               min = 224,
-               max = 1024,
+               min = 400,
+               max = 2000,
                increment = 1,
                precision = 0,
                alignment = 'left',
-               tooltip = 'Allowable range 224 to 1024 pixels. Higher values use more bandwidth, but may deliver more accurate results.',
+               tooltip = 'Allowable range 400 to 2000 pixels. Higher values use more bandwidth, but may deliver more accurate results.',
                value = bind { key = 'imageSize', object = prefs },
             },
          },
@@ -195,7 +295,7 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
             viewFactory:spacer { width = share 'title_width', height = 1 },
 
             viewFactory:static_text {
-               title = LOC '$$$/ClarifaiTagger/Settings/ThumbnailSizeDesc=Size of image sent to the Clarifai server',
+               title = LOC '$$$/ClarifaiTagger/Settings/ImageSizeDesc=Size of image sent to the Clarifai server',
                alignment = 'right',
             },
          },
@@ -253,6 +353,7 @@ function ClarifaiTaggerInfoProvider.sectionsForBottomOfDialog(viewFactory, prope
          title = LOC '$$$/ClarifaiTagger/Settings/acknowledgements=Acknowledgements',
          viewFactory:static_text {
             title = LOC '$$$/ClarifaiTagger/Settings/simpleJSON=Simple JSON',
+            font = '<system/bold>',
          },
          viewFactory:edit_field {
             width_in_chars = 80,
@@ -262,6 +363,7 @@ function ClarifaiTaggerInfoProvider.sectionsForBottomOfDialog(viewFactory, prope
          },
          viewFactory:static_text {
             title = LOC '$$$/ClarifaiTagger/Settings/KwUtils=KwUtils: Keyword Utility Functions for Lightroom',
+            font = '<system/bold>',
          },
          viewFactory:edit_field {
             width_in_chars = 80,
@@ -271,6 +373,7 @@ function ClarifaiTaggerInfoProvider.sectionsForBottomOfDialog(viewFactory, prope
          },
          viewFactory:static_text {
             title = LOC '$$$/ClarifaiTagger/Settings/Lutils=LUTILS: Lua Utility Functions for Lightroom',
+            font = '<system/bold>',
          },
          viewFactory:edit_field {
             width_in_chars = 80,

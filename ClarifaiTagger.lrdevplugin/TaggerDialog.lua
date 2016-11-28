@@ -60,6 +60,7 @@ local function makeCheckbox(i, j, k, keyword, prob, boldKeywords, showProbabilit
    }
 end
 
+-- Builds the tagger Dialog window
 local function makeWindow(catalog, photos, json)
    local results = json['results']
    for _, result  in ipairs(results) do
@@ -85,9 +86,31 @@ local function makeWindow(catalog, photos, json)
             spacing = f:label_spacing(8),
             bind_to_object = properties,
             f:catalog_photo {
-               width = 300,
+               width = prefs.thumbnailSize,
                photo = photo,
-            },
+            }
+         }
+         local previewWidth = prefs.imagePreviewWindowWidth;
+         local previewHeight = prefs.imagePreviewWindowHeight;
+         local previewButtonTt = "Open larger preview (in " .. previewWidth .. " x " .. previewHeight .. "px window)";
+         tbl[2] = f:row {
+            f:push_button {
+               title = 'View Full Size Image',
+               tooltip = previewButtonTt,
+               action = function (clickedview)
+                  LrDialogs.presentModalDialog({
+                     title = 'Review Image',
+                     contents = f:catalog_photo {
+                        photo = photo,
+                        width = previewWidth,
+                        height = previewHeight,
+                        tooltip = "Press “Enter” key to close if the “Close Window” button is off-screen",
+                     },
+                     cancelVerb = '< exclude >',
+                     actionVerb = 'Close Window',
+                  });
+               end
+            }
          }
 
          for j = 1, #keywords do
@@ -142,8 +165,8 @@ local function makeWindow(catalog, photos, json)
       end
 
       local contents = f:scrolled_view {
-         width = 880,
-         height = 680,
+         width = prefs.taggingWindowWidth,
+         height = prefs.taggingWindowHeight,
          background_color = LrColor(0.9, 0.9, 0.9),
          f:row(columns)
       }
