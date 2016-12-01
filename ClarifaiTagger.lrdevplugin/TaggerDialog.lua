@@ -26,19 +26,21 @@ local function getCheckboxLabel(i, j, k)
    return 'check_' .. tostring(i) .. '_' .. tostring(j) .. '_' .. tostring(k)
 end
 
-local function makeCheckbox(i, j, k, keyword, prob, boldKeywords, showProbability)
+local function makeCheckbox(i, j, k, tagName, prob, boldKeywords, showProbability)
    local f = LrView.osFactory()
    -- Tooltip should show the hierarchical level of a keyword
    local tt = ''
-   local lowerkey = string.lower(keyword)
-   if KwUtils.catKwPaths[lowerkey] and KwUtils.catKwPaths[lowerkey][k] == '' then
+   local lowerkey = string.lower(tagName)
+   if KwUtils.catKwPaths[lowerkey] ~= nil and KwUtils.catKwPaths[lowerkey][k] == '' then
        tt = '(In the keyword root level)'
    elseif KwUtils.catKwPaths[lowerkey] ~= nil then
        tt = '(In ' .. KwUtils.catKwPaths[lowerkey][k] .. ')'
+   else -- KwUtils.catKwPaths[lowerkey] == nil
+      tt = "New keyword by the name “”" .. tagName .. "” will be created by selecting this tag."
    end
 
    local checkbox = {
-      title = keyword,
+      title = tagName,
       tooltip = tt,
       value = LrView.bind(getCheckboxLabel(i, j, k)),
    }
