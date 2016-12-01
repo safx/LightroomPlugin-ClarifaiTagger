@@ -93,7 +93,7 @@ local function makeWindow(catalog, photos, json)
          local previewWidth = prefs.imagePreviewWindowWidth;
          local previewHeight = prefs.imagePreviewWindowHeight;
          local previewButtonTt = "Open larger preview (in " .. previewWidth .. " x " .. previewHeight .. "px window)";
-         tbl[2] = f:row {
+         tbl[#tbl + 1] = f:row {
             f:push_button {
                title = 'View Full Size Image',
                tooltip = previewButtonTt,
