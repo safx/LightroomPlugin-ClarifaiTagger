@@ -1,7 +1,3 @@
-local Require = require 'Require'.path ("../../debugscript.lrdevplugin")
-local Debug = require 'Debug'.init ()
-require 'strict'
-
 local LrApplication = import 'LrApplication'
 local LrBinding = import "LrBinding"
 local LrColor = import 'LrColor'
@@ -73,7 +69,7 @@ local function makeWindow(catalog, photos, json)
    local autoSelectExistingKeywords = prefs.autoSelectExistingKeywords
    local showProbability = prefs.showProbability
 
-   LrFunctionContext.callWithContext('showDialog', Debug.showErrors(function(context)
+   LrFunctionContext.callWithContext('showDialog', function(context)
       local f = LrView.osFactory()
       local bind = LrView.bind
 
@@ -226,7 +222,7 @@ local function makeWindow(catalog, photos, json)
                end
          end )
       end
-   end ))
+   end )
 end
 
 local function requestJpegThumbnails(target_photos, processed_photos, generated_thumbnails, callback)
@@ -261,7 +257,7 @@ end
 
 local thumbnailDir = LrPathUtils.getStandardFilePath('temp')
 
-LrTasks.startAsyncTask(Debug.showErrors(function()
+LrTasks.startAsyncTask(function()
    local catalog = LrApplication.activeCatalog()
    local photos = reverseArray(catalog:getTargetPhotos())
 
@@ -298,7 +294,6 @@ LrTasks.startAsyncTask(Debug.showErrors(function()
 
              -- Populate the KwUtils.catKws and KwUtils.catKwPaths tables
              local allKeys = KwUtils.getAllKeywords(catalog)
-             Debug.lognpp("All keywords", allKeys)
              makeWindow(catalog, photos, json)
 
              for _, thumbnailPath in ipairs(thumbnailPaths) do
@@ -306,4 +301,4 @@ LrTasks.startAsyncTask(Debug.showErrors(function()
              end
        end )
    end )
-end))
+end)
