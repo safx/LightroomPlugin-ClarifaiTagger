@@ -190,7 +190,8 @@ local function makeWindow(catalog, photos, json)
                      if numKeysByName == 0 then
                         local checkboxState = properties[getCheckboxLabel(i, j, 0)]
                         if checkboxState ~= false then
-                           local keyword = catalog:createKeyword(kwName, {}, false, nil, true)
+                          -- catalog:createKeyword( keywordName, synonyms, includeOnExport, parent, returnExisting )
+                           local keyword = catalog:createKeyword(kwName, {}, true, nil, true)
                            if keyword == false then
                               -- Keyword created in current withWriteAccessDo block, so is inaccessible via `returnExisting`.
                               keyword = newKeywords[kwName]
