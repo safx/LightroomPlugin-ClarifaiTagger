@@ -1,6 +1,8 @@
 local LrHttp = import 'LrHttp'
 local LrLogger = import 'LrLogger'
 local LrPathUtils = import 'LrPathUtils'
+local LrStringUtils = import 'LrStringUtils'
+local LrFileUtils = import 'LrFileUtils'
 local JSON = require 'JSON'
 local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
 
@@ -8,61 +10,47 @@ local logger = LrLogger('ClarifaiAPI')
 logger:enable('print')
 
 
-local tagAPIURL   = 'https://api.clarifai.com/v1/tag/'
-local tokenAPIURL = 'https://api.clarifai.com/v1/token/'
+local tagAPIURL   = 'https://api.clarifai.com/v2/models/aaa03c23b3724a16a56b629203edc62c/outputs'
 
 --------------------------------
 
 ClarifaiAPI = {}
 
-function ClarifaiAPI.getToken()
-   local headers = {
-      { field = 'Content-Type', value = 'application/x-www-form-urlencoded' },
-      { field = 'Accept-Language', value = 'ja-JP' },
-   };
-
-   local data = 'grant_type=client_credentials&client_id=' .. prefs.clientId .. '&client_secret=' .. prefs.clientSecret;
-   local body, reshdrs = LrHttp.post(tokenAPIURL, data, headers);
-
-   logger:info(' get token', reshdrs.status, body);
-
-   local json = JSON:decode(body);
-   prefs.accessToken = json.access_token;
-end
-
 function ClarifaiAPI.getTags_impl(photos, thumbnailPaths)
-   local mimeChunks = {};
+    local headers = {
+       { field = 'Authorization', value = 'Key ' .. prefs.clientId },
+      --  { field = 'Authorization', value = 'Key e2a415c0928445c3864ac960713e9dee' },
+       { field = 'Content-Type', value = 'application/json' },
+      --  { field = 'Accept-Language', value = prefs.keywordLanguage },
+    };
 
-   for idx, photo in ipairs(photos) do
-      local thumbnailPath = thumbnailPaths[idx];
-      local filePath = photo.path -- photo:getRawMetadata('path');
-      local fileName = LrPathUtils.leafName(filePath);
-      mimeChunks[ #mimeChunks + 1 ] = { name = 'encoded_data', fileName = fileName, filePath = thumbnailPath, contentType = 'application/octet-stream' };
-   end
-
-   local headers = {
-      { field = 'Authorization', value = 'Bearer ' .. prefs.accessToken },
-      { field = 'Accept-Language', value = prefs.keywordLanguage },
-   };
-
-   logger:info(' get tags START');
-   local body, reshdrs = LrHttp.postMultipart(tagAPIURL, mimeChunks, headers);
-   logger:info(' get tags', reshdrs.status);
+    local payload_prefix = '{"inputs": ['
+    local payload_middle =  ''
+    local payload_postfix = ']}'
+    for idx, photo in ipairs(photos) do
+      --payload_middle = '{"data":{"image":{"url": "https://samples.clarifai.com/metro-north.jpg"}}}';
+      payload_middle = payload_middle .. '{"data":{"image":{"base64": "' .. LrStringUtils.encodeBase64(LrFileUtils.readFile(thumbnailPaths[idx])) .. '"}}},';
+    end
+    payload_middle = payload_middle:sub(1, -2)
+    local payload = payload_prefix .. payload_middle .. payload_postfix;
+    logger:info(' get tags START');
+    local body, reshdrs = LrHttp.post(tagAPIURL, payload, headers, "POST", 50, string.len(payload))
+    -- logger:info(' get tags body: ', body);
 
    local json = JSON:decode(body);
    return json, reshdrs.status;
 end
 
 function ClarifaiAPI.getTags(photos, thumbnailPaths)
-   if prefs.accessToken == nil then
-      ClarifaiAPI.getToken();
-   end
+  --  if prefs.accessToken == nil then
+  --     ClarifaiAPI.getToken();
+  --  end
 
    local json, status = ClarifaiAPI.getTags_impl(photos, thumbnailPaths);
-   if status == 401 then
-      ClarifaiAPI.getToken();
-      json, status = ClarifaiAPI.getTags_impl(photos, thumbnailPaths);
-   end
+  --  if status == 401 then
+  --     ClarifaiAPI.getToken();
+  --     json, status = ClarifaiAPI.getTags_impl(photos, thumbnailPaths);
+  --  end
 
    return json
 end
