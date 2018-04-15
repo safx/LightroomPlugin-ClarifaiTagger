@@ -61,9 +61,9 @@ end
 -- Builds the tagger Dialog window
 local function makeWindow(catalog, photos, json)
    local results = json['results']
-   for _, result  in ipairs(results) do
-      local cs = result['result']['tag']['classes']
-   end
+  --  for _, result  in ipairs(results) do
+  --     local cs = result['result']['tag']['classes']
+  --  end
 
    local boldExistingKeywords = prefs.boldExistingKeywords
    local autoSelectExistingKeywords = prefs.autoSelectExistingKeywords
@@ -77,8 +77,18 @@ local function makeWindow(catalog, photos, json)
 
       local columns = {}
       for i, photo in ipairs(photos) do
-         local keywords = json['results'][i]['result']['tag']['classes']
-         local probs    = json['results'][i]['result']['tag']['probs']
+         --  local keywords = json['results'][i]['result']['tag']['classes']
+         --  local probs    = json['results'][i]['result']['tag']['probs']
+         logger:info(' concepts ', i);
+         local keywords = {}
+         local probs    = {}
+         local concepts = json['outputs'][i]['data']['concepts']
+         for i, concept in ipairs(concepts) do
+            -- logger:info(' concepts: ', concept['name'])
+            table.insert(keywords, concept['name'])
+            table.insert(probs, concept['value'])
+         end
+
 
          local tbl = {
             spacing = f:label_spacing(8),
@@ -117,7 +127,7 @@ local function makeWindow(catalog, photos, json)
 
             -- Make sure we are selecting checkboxes for keywords already on a photo:
             local selectKeyword = KwUtils.hasKeywordByName(photo, keywords[j])
-            
+
             local boldKeyword = false;
             local kwExists = (KwUtils.keywordExists(keywords[j]) ~= false) and true or false
 
@@ -179,7 +189,17 @@ local function makeWindow(catalog, photos, json)
          local newKeywords = {}
          catalog:withWriteAccessDo('writePhotosKeywords', function(context)
                for i, photo in ipairs(photos) do
-                  local keywords = json['results'][i]['result']['tag']['classes']
+                  -- local keywords = json['results'][i]['result']['tag']['classes']
+
+                  local keywords = {}
+                  -- local probs    = {}
+                  local concepts = json['outputs'][i]['data']['concepts']
+                  for i, concept in ipairs(concepts) do
+                     logger:info(' concepts: ', concept['name'])
+                     table.insert(keywords, concept['name'])
+                    --  table.insert(probs, concept['value'])
+                  end
+
                   for j = 1, #keywords do
                      local kwName = keywords[j]
                      local kwLower = string.lower(kwName)
@@ -199,11 +219,11 @@ local function makeWindow(catalog, photos, json)
                               newKeywords[kwName] = keyword
                            end
                            photo:addKeyword(keyword)
-                           
+
                         end
 
                       -- Not a new term, but only one checkbox exists for the term:
-                     else 
+                     else
                         for k=1, numKeysByName do
                            local checkboxState = properties[getCheckboxLabel(i, j, k)]
                            local keyword = KwUtils.catKws[kwLower][k]
@@ -279,8 +299,8 @@ LrTasks.startAsyncTask(function()
           local fileName = LrPathUtils.leafName(filePath)
           local path = LrPathUtils.child(thumbnailDir, fileName)
           local jpg_path = LrPathUtils.addExtension(path, 'jpg')
-
-          local out = io.open(jpg_path, 'w')
+          logger:info(' jpg_path ', jpg_path)
+          local out = io.open(jpg_path, 'wb')
           io.output(out)
           io.write(thumbnail)
           io.close(out)
