@@ -3,9 +3,9 @@
 local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
 
 local defaultPrefValues = {
-   -- CLARIFAI CONFIGURATION
-   clientId = 'Copy from application on Clarifai.com',
-   clientSecret = 'Copy from application on Clarifai.com',
+   -- Azure CONFIGURATION
+   visionKey = 'Copy from portal.azure.com',
+   visionBaseURL = 'https://westeurope.api.cognitive.microsoft.com/',
    imageSize = 600, -- Default for size of image sent to Clarifai
    keywordLanguage = '', -- Default is language used for creating your Clarifai application
 

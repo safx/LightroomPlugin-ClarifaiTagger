@@ -9,12 +9,12 @@ local LrPathUtils = import 'LrPathUtils'
 local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
 local LrTasks = import 'LrTasks'
 local LrView = import "LrView"
-local ClarifaiAPI = require 'ClarifaiAPI'
+local ClarifaiAPI = require 'AzureVisionAPI'
 local KwUtils = require 'KwUtils'
 local LUTILS = require 'LUTILS'
 
-local logger = LrLogger('ClarifaiAPI')
-logger:enable('print')
+local logger = LrLogger('AzureVisionAPI')
+logger:enable('logfile')
 
 -----------------------------------------
 -- Returns a checkbox label used in the dialog. i, j, and k are normally all integers
@@ -82,11 +82,13 @@ local function makeWindow(catalog, photos, json)
          logger:info(' concepts ', i);
          local keywords = {}
          local probs    = {}
-         local concepts = json['outputs'][i]['data']['concepts']
+         
+         --ToDo: Refactoring!!!
+         local concepts = json[i]['tags']
          for i, concept in ipairs(concepts) do
-            -- logger:info(' concepts: ', concept['name'])
+            logger:info(' category: ', concept['name'])
             table.insert(keywords, concept['name'])
-            table.insert(probs, concept['value'])
+            table.insert(probs, concept['confidence'])
          end
 
 
@@ -180,7 +182,7 @@ local function makeWindow(catalog, photos, json)
       }
 
       local result = LrDialogs.presentModalDialog({
-         title = LOC '$$$/ClarifaiTagger/TaggerWindow/Title=Clarifai Tagger',
+         title = LOC '$$$/AzureVisionTagger/TaggerWindow/Title=Clarifai Tagger',
          contents = contents,
          actionVerb = 'Save',
       })
@@ -284,8 +286,8 @@ LrTasks.startAsyncTask(function()
 
    local limitSize = 128 -- currently Clarifai's max_batch_size
    if #photos > limitSize then
-      local message = LOC '$$$/ClarifaiTagger/TaggerWindow/ExceedsBatchSizeMessage=Selected photos execeeds the limit (%d).'
-      local info = LOC '$$$/ClarifaiTagger/TaggerWindow/ExceedsBatchSizeInfo=%d photos are selected currently.'
+      local message = LOC '$$$/AzureVisionTagger/TaggerWindow/ExceedsBatchSizeMessage=Selected photos execeeds the limit (%d).'
+      local info = LOC '$$$/AzureVisionTagger/TaggerWindow/ExceedsBatchSizeInfo=%d photos are selected currently.'
       LrDialogs.message(string.format(message, limitSize), string.format(info, #photos), 'warning')
       return
    end
@@ -308,7 +310,7 @@ LrTasks.startAsyncTask(function()
        end
 
        LrTasks.startAsyncTask(function()
-             local message = LOC '$$$/ClarifaiTagger/TaggerWindow/ProcessingMessage=Sending thumbnails of the selected photos...'
+             local message = LOC '$$$/AzureVisionTagger/TaggerWindow/ProcessingMessage=Sending thumbnails of the selected photos...'
              LrDialogs.showBezel(message, 2)
 
              local json = ClarifaiAPI.getTags(photos, thumbnailPaths)
