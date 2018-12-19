@@ -194,7 +194,7 @@ function AzureVisionTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, prope
             spacing = viewFactory:label_spacing(),
 
             viewFactory:static_text {
-               title = LOC '$$$/AzureVisionTagger/Settings/autoSelectProbabilityThreshold=Probability threshold for auto-selection:',
+               title = LOC '$$$/AzureVisionTagger/Settings/autoSelectProbabilityThreshold=Confidence threshold for auto-selection:',
                alignment = 'left',
                width = share 'title_width',
             },
@@ -215,17 +215,25 @@ function AzureVisionTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, prope
                increment = 1,
                precision = 0,
                alignment = 'left',
-               tooltip = 'Setting for what level of Clarifai-rated probability is required for a keyword to be auto-selected.\n\nIgnored unless the "Auto-Select existing keywords" setting is selected.',
+               tooltip = 'Setting for what level of Azure-rated confidence is required for a keyword to be auto-selected.\n\nIgnored unless the "Auto-Select existing keywords" setting is selected.',
                value = bind { key = 'autoSelectProbabilityThreshold', object = prefs },
             },
+
+            spacing = viewFactory:control_spacing(),
+
+            viewFactory:checkbox {
+               title = LOC '$$$/AzureVisionTagger/Settings/alsoSelectNewKeywords=also autoselct new keywords',
+               tooltip = "Selecting this option will display will also autoselct keywords which are not already in your keyword list",
+               value = bind { key = 'alsoSelectNewKeywords', object = prefs },
+            }
          },
 
          viewFactory:row {
             spacing = viewFactory:control_spacing(),
 
             viewFactory:checkbox {
-               title = LOC '$$$/AzureVisionTagger/Settings/showProbability=Show Probability',
-               tooltip = "Selecting this will display Clarifai's level of certainty that a keyword is accurate.",
+               title = LOC '$$$/AzureVisionTagger/Settings/showProbability=Show Confidence',
+               tooltip = "Selecting this will display Azure's level of confidence that a keyword is accurate.",
                value = bind { key = 'showProbability', object = prefs },
             },
          },

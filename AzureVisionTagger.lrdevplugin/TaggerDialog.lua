@@ -9,7 +9,7 @@ local LrPathUtils = import 'LrPathUtils'
 local prefs = import 'LrPrefs'.prefsForPlugin(_PLUGIN.id)
 local LrTasks = import 'LrTasks'
 local LrView = import "LrView"
-local ClarifaiAPI = require 'AzureVisionAPI'
+local AzureVisionApi = require 'AzureVisionAPI'
 local KwUtils = require 'KwUtils'
 local LUTILS = require 'LUTILS'
 
@@ -79,16 +79,15 @@ local function makeWindow(catalog, photos, json)
       for i, photo in ipairs(photos) do
          --  local keywords = json['results'][i]['result']['tag']['classes']
          --  local probs    = json['results'][i]['result']['tag']['probs']
-         logger:info(' concepts ', i);
-         local keywords = {}
-         local probs    = {}
+         logger:info(' avTags ', i);
+         local keywords = {} -- The tag as received from azure
+         local probs    = {} -- The confidence of the tag
          
-         --ToDo: Refactoring!!!
-         local concepts = json[i]['tags']
-         for i, concept in ipairs(concepts) do
-            logger:info(' category: ', concept['name'])
-            table.insert(keywords, concept['name'])
-            table.insert(probs, concept['confidence'])
+         local avTags = json[i]['tags']
+         for i, tag in ipairs(avTags) do
+            logger:info(' tag: ', tag['name'])
+            table.insert(keywords, tag['name'])
+            table.insert(probs, tag['confidence'])
          end
 
 
@@ -138,10 +137,14 @@ local function makeWindow(catalog, photos, json)
                if boldExistingKeywords then
                   boldKeyword = kwExists
                end
-               -- Probability from Clarifai actually expressed as fraction of one.
+               -- Probability from Azure actually expressed as fraction of one.
                local prob = tonumber(probs[j]) * 100
-               if autoSelectExistingKeywords and prob >= tonumber(prefs.autoSelectProbabilityThreshold) then
-                  selectKeyword = kwExists
+               if autoSelectExistingKeywords and tonumber(prob) >= tonumber(prefs.autoSelectProbabilityThreshold) then
+                  if prefs.alsoSelectNewKeywords then 
+                     selectKeyword = true
+                  else
+                     selectKeyword = kwExists
+                  end
                end
             end
             if numKeysByName ~= false then
@@ -153,7 +156,7 @@ local function makeWindow(catalog, photos, json)
             else
                local k = 0
                -- It is a new keyword so will not be selected automatically
-               properties[getCheckboxLabel(i, j, k)] = false
+               properties[getCheckboxLabel(i, j, k)] = selectKeyword --false
                tbl[#tbl + 1] = makeCheckbox(i, j, k, keywords[j], probs[j], boldKeyword, showProbability)
             end
          end
@@ -182,7 +185,7 @@ local function makeWindow(catalog, photos, json)
       }
 
       local result = LrDialogs.presentModalDialog({
-         title = LOC '$$$/AzureVisionTagger/TaggerWindow/Title=Clarifai Tagger',
+         title = LOC '$$$/AzureVisionTagger/TaggerWindow/Title=AzureVision Tagger',
          contents = contents,
          actionVerb = 'Save',
       })
@@ -195,10 +198,10 @@ local function makeWindow(catalog, photos, json)
 
                   local keywords = {}
                   -- local probs    = {}
-                  local concepts = json['outputs'][i]['data']['concepts']
-                  for i, concept in ipairs(concepts) do
-                     logger:info(' concepts: ', concept['name'])
-                     table.insert(keywords, concept['name'])
+                  local avTags = json[i]['tags']
+                  for i, tag in ipairs(avTags) do
+                     logger:info(' avTags: ', tag['name'])
+                     table.insert(keywords, tag['name'])
                     --  table.insert(probs, concept['value'])
                   end
 
@@ -313,7 +316,7 @@ LrTasks.startAsyncTask(function()
              local message = LOC '$$$/AzureVisionTagger/TaggerWindow/ProcessingMessage=Sending thumbnails of the selected photos...'
              LrDialogs.showBezel(message, 2)
 
-             local json = ClarifaiAPI.getTags(photos, thumbnailPaths)
+             local json = AzureVisionApi.getTags(photos, thumbnailPaths)
 
              -- Populate the KwUtils.catKws and KwUtils.catKwPaths tables
              local allKeys = KwUtils.getAllKeywords(catalog)

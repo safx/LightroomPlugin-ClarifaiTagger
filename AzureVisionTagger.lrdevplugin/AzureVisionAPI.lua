@@ -10,7 +10,7 @@ local logger = LrLogger('AzureVisionAPI')
 logger:enable('logfile')
 
 
-local tagAPIURL   = prefs.visionBaseURL .. 'vision/v1.0/analyze'
+local tagAPIURL   = prefs.visionBaseURL .. 'vision/v2.0/analyze'
 
 
 --------------------------------
@@ -21,7 +21,7 @@ function AzureVisionAPI.getTags_impl(photos, thumbnailPaths)
     logger:info('AzureVisionAPI.getTags_impl')
     local jsonResults = {}
     local resStatus = 200
-    local visualFeatures = 'Tags'
+    local visualFeatures = 'Categories,Tags,Description&Details=Celebrities,Landmarks'
     tagAPIURL = tagAPIURL .. '?Visualfeatures=' .. visualFeatures
     logger:info('Visualfeatures: ' ..  visualFeatures)
     logger:info('URL: ' .. tagAPIURL)
