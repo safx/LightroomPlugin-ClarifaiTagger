@@ -82,7 +82,8 @@ local function makeWindow(catalog, photos, json)
          logger:info(' avTags ', i);
          local keywords = {} -- The tag as received from azure
          local probs    = {} -- The confidence of the tag
-         
+         local captions = {}
+
          local avTags = json[i]['tags']
          for i, tag in ipairs(avTags) do
             logger:info(' tag: ', tag['name'])
@@ -90,6 +91,10 @@ local function makeWindow(catalog, photos, json)
             table.insert(probs, tag['confidence'])
          end
 
+         local avCaption  = json[i]['description']['captions']
+         for l, caption in ipairs(avCaption) do
+            table.insert( captions, caption['text'] )
+         end
 
          local tbl = {
             spacing = f:label_spacing(8),
@@ -195,6 +200,15 @@ local function makeWindow(catalog, photos, json)
          catalog:withWriteAccessDo('writePhotosKeywords', function(context)
                for i, photo in ipairs(photos) do
                   -- local keywords = json['results'][i]['result']['tag']['classes']
+
+                  
+                  local captions = json[i]['description']['captions']
+                  for i, caption in ipairs(captions) do
+                     --local _cap = photo:setPropertyForPlugin(_PLUGIN.id, 'azureVisionCaption', caption)
+                     photo:setPropertyForPlugin(_PLUGIN, 'azureVisionCaption', caption['text'])
+                  end
+                  --local caption = json[i]['description']['captions'][0]['text']
+                  --photo:setPropertyForPlugin(_PLUGIN.id, 'azureVisionCaption', caption)
 
                   local keywords = {}
                   -- local probs    = {}

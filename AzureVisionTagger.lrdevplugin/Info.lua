@@ -8,8 +8,9 @@ return {
    LrSdkVersion = 5.0,
    LrSdkMinimumVersion = 5.0,
 
-   LrToolkitIdentifier = "com.jidev.azurevision",
+   LrToolkitIdentifier = "com.hanebambel.lightroom.plugin.azurevision",
    LrPluginInfoUrl = "https://github.com/safx/LightroomPlugin-ClarifaiTagger",
+
    
    LrPluginName = "AzureVisionTagger",
    -- Put in both "File" and "Library" plugin menus
@@ -17,6 +18,10 @@ return {
    LrLibraryMenuItems = menuItems,
    LrPluginInfoProvider = 'AzureVisionTaggerInfoProvider.lua',
    LrInitPlugin = 'AzureVisionTaggerInit.lua',
+
+   -- Azure specific Metadata extension
+   LrMetadataProvider = 'AzureVisionMetadataDefinition.lua',
+   LrMetadataTagsetFactory = 'AzureVisionTagset.lua',
 
    VERSION = {display='1.0.0', major=1, minor=0, revision=0, build=20181218},
 }
