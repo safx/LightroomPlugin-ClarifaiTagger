@@ -223,7 +223,7 @@ function AzureVisionTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, prope
 
             viewFactory:checkbox {
                title = LOC '$$$/AzureVisionTagger/Settings/alsoSelectNewKeywords=also autoselct new keywords',
-               tooltip = "Selecting this option will display will also autoselct keywords which are not already in your keyword list",
+               tooltip = "Selecting this option will also autoselct keywords which are not already in your keyword list",
                value = bind { key = 'alsoSelectNewKeywords', object = prefs },
             }
          },
@@ -266,7 +266,7 @@ function AzureVisionTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, prope
             spacing = viewFactory:control_spacing(),
 
             viewFactory:static_text {
-               title = LOC '$$$/AzureVisionTagger/Settings/imageSize=Image size (sent to Clarifai)',
+               title = LOC '$$$/AzureVisionTagger/Settings/imageSize=Image size (sent to Azure)',
                alignment = 'left',
                width = share 'title_width',
             },
@@ -297,7 +297,7 @@ function AzureVisionTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, prope
             viewFactory:spacer { width = share 'title_width', height = 1 },
 
             viewFactory:static_text {
-               title = LOC '$$$/AzureVisionTagger/Settings/ImageSizeDesc=Size of image sent to the Clarifai server',
+               title = LOC '$$$/AzureVisionTagger/Settings/ImageSizeDesc=Size of image sent to the Azure server',
                alignment = 'right',
             },
          },

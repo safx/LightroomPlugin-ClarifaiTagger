@@ -19,6 +19,8 @@ local defaultPrefValues = {
    autoSelectProbabilityThreshold = 85,
     -- Display the Clarifai-assessed probability for each keyword
    showProbability = false,
+   -- also autoselect new keywords above the probability threshold
+   alsoSelectNewKeywords = false,
    -- Dimensions of the tagging window (default is low and matches former hard-coded setting, but can be set very high)
    taggingWindowHeight = 680, -- pixels high
    taggingWindowWidth = 880, -- pixels wide

@@ -207,6 +207,9 @@ local function makeWindow(catalog, photos, json)
                      --local _cap = photo:setPropertyForPlugin(_PLUGIN.id, 'azureVisionCaption', caption)
                      photo:setPropertyForPlugin(_PLUGIN, 'azureVisionCaption', caption['text'])
                   end
+
+                  photo:setPropertyForPlugin(_PLUGIN, 'azureVisionRequestID', json[i]['requestId'])
+                  photo:setPropertyForPlugin(_PLUGIN, 'azureVisionRequestTS', string.format('%s', os.date('%Y-%m-%d %H:%m:%S')))
                   --local caption = json[i]['description']['captions'][0]['text']
                   --photo:setPropertyForPlugin(_PLUGIN.id, 'azureVisionCaption', caption)
 
