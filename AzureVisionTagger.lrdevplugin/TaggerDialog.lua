@@ -233,7 +233,7 @@ local function makeWindow(catalog, photos, json)
                   
                   -- Azure Vision API Request Metadata
                   photo:setPropertyForPlugin(_PLUGIN, 'azureVisionRequestID', json[i]['requestId'])
-                  photo:setPropertyForPlugin(_PLUGIN, 'azureVisionRequestTS', string.format('%s', os.date('%Y-%m-%d %H:%m:%S')))
+                  photo:setPropertyForPlugin(_PLUGIN, 'azureVisionRequestTS', string.format('%s', os.date('%Y-%m-%d %H:%M:%S')))
 
 
                   local keywords = {}
