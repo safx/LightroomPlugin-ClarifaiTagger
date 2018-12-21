@@ -104,6 +104,12 @@ local function makeWindow(catalog, photos, json)
                photo = photo,
             }
          }
+
+         tbl[#tbl +1] = f:static_text {
+            title = table.concat(captions, ', '),
+            text_color = LrColor(0.3, 0.3, 0.3),
+         }
+
          local previewWidth = prefs.imagePreviewWindowWidth;
          local previewHeight = prefs.imagePreviewWindowHeight;
          local previewButtonTt = "Open larger preview (in " .. previewWidth .. " x " .. previewHeight .. "px window)";
@@ -202,16 +208,33 @@ local function makeWindow(catalog, photos, json)
                   -- local keywords = json['results'][i]['result']['tag']['classes']
 
                   
+                  -- Description: Captions
                   local captions = json[i]['description']['captions']
                   for i, caption in ipairs(captions) do
                      --local _cap = photo:setPropertyForPlugin(_PLUGIN.id, 'azureVisionCaption', caption)
                      photo:setPropertyForPlugin(_PLUGIN, 'azureVisionCaption', caption['text'])
                   end
 
+                  -- Description: Tags
+                  local tags = {}
+                  local avTags = json[i]['description']['tags']
+                  for m, tag in ipairs(avTags) do
+                     table.insert( tags, tag )
+                  end
+                  photo:setPropertyForPlugin(_PLUGIN, 'azureVisionTags', table.concat(tags, ', '))
+
+                  -- Colors
+                  local colors = {}
+                  local avColors = json[i]['color']['dominantColors']
+                  for n, color in ipairs(avColors) do
+                     table.insert( colors, color )
+                  end
+                  photo:setPropertyForPlugin(_PLUGIN, 'azureVisionColors', table.concat(colors, ', '))
+                  
+                  -- Azure Vision API Request Metadata
                   photo:setPropertyForPlugin(_PLUGIN, 'azureVisionRequestID', json[i]['requestId'])
                   photo:setPropertyForPlugin(_PLUGIN, 'azureVisionRequestTS', string.format('%s', os.date('%Y-%m-%d %H:%m:%S')))
-                  --local caption = json[i]['description']['captions'][0]['text']
-                  --photo:setPropertyForPlugin(_PLUGIN.id, 'azureVisionCaption', caption)
+
 
                   local keywords = {}
                   -- local probs    = {}

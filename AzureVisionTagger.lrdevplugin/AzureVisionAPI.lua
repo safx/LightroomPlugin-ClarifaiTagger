@@ -21,7 +21,7 @@ function AzureVisionAPI.getTags_impl(photos, thumbnailPaths)
     logger:info('AzureVisionAPI.getTags_impl')
     local jsonResults = {}
     local resStatus = 200
-    local visualFeatures = 'Categories,Tags,Description&Details=Celebrities,Landmarks'
+    local visualFeatures = 'Categories,Tags,Description,Color&Details=Celebrities,Landmarks'
     tagAPIURL = tagAPIURL .. '?Visualfeatures=' .. visualFeatures
     logger:info('Visualfeatures: ' ..  visualFeatures)
     logger:info('URL: ' .. tagAPIURL)

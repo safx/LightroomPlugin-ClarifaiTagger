@@ -41,6 +41,15 @@ return {
         },
 
         {
+            id = 'azureVisionTags',
+            title = LOC "$$$/AzureVisionTagger/Fields/AzureVisionCaption=Tags",
+            dataType = 'string',
+            version = 1,
+            searchable = true,
+            browsable = true
+        },
+
+        {
             id = 'azureVisionRequestID',
             title = LOC "$$$/AzureVisionTagger/Fields/AzureVisionCaption=RequestID",
             dataType = 'string',
