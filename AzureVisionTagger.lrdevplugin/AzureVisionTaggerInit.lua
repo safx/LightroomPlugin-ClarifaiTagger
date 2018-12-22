@@ -7,7 +7,7 @@ local defaultPrefValues = {
    visionKey = 'Copy from portal.azure.com',
    visionBaseURL = 'https://westeurope.api.cognitive.microsoft.com/',
    imageSize = 600, -- Default for size of image sent to Clarifai
-   keywordLanguage = '', -- Default is language used for creating your Clarifai application
+   --keywordLanguage = '', -- Default is language used for creating your Clarifai application
 
    -- TAGGING WINDOW SETTINGS
    thumbnailSize = 300, -- Thumbnails shown above columns of keyword checkboxes

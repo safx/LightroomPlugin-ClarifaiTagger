@@ -54,12 +54,36 @@ function AzureVisionTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, prope
                -- width = share 'title_width',
             },
 
+            --[[
             viewFactory:edit_field {
                tooltip = "Copy from your Azure Account",
                fill_horizonal = 1,
                width_in_chars = 35,
                alignment = 'left',
                value = bind { key = 'visionBaseURL', object = prefs },
+            },
+            ]]--
+
+            viewFactory:popup_menu {
+               items = {
+                  { value = 'https://westus.api.cognitive.microsoft.com/', title = 'West US - westus.api.cognitive.microsoft.com' },
+                  { value = 'https://westus2.api.cognitive.microsoft.com/' , title = 'West US 2 - westus2.api.cognitive.microsoft.com' },
+                  { value = 'https://eastus.api.cognitive.microsoft.com/' , title = 'East US - eastus.api.cognitive.microsoft.com' },
+                  { value = 'https://eastus2.api.cognitive.microsoft.com/' , title = 'East US 2 - eastus2.api.cognitive.microsoft.com' },
+                  { value = 'https://westcentralus.api.cognitive.microsoft.com/' , title = 'West Central US - westcentralus.api.cognitive.microsoft.com' },
+                  { value = 'https://southcentralus.api.cognitive.microsoft.com/' , title = 'South Central US - southcentralus.api.cognitive.microsoft.com' },
+                  { value = 'https://westeurope.api.cognitive.microsoft.com/' , title = 'West Europe - westeurope.api.cognitive.microsoft.com' },
+                  { value = 'https://northeurope.api.cognitive.microsoft.com/' , title = 'North Europe - northeurope.api.cognitive.microsoft.com' },
+                  { value = 'https://southeastasia.api.cognitive.microsoft.com/' , title = 'Southeast Asia - southeastasia.api.cognitive.microsoft.com' },
+                  { value = 'https://eastasia.api.cognitive.microsoft.com/' , title = 'East Asia - eastasia.api.cognitive.microsoft.com' },
+                  { value = 'https://australiaeast.api.cognitive.microsoft.com/' , title = 'Australia East - australiaeast.api.cognitive.microsoft.com' },
+                  { value = 'https://brazilsouth.api.cognitive.microsoft.com/' , title = 'Brazil South - brazilsouth.api.cognitive.microsoft.com' },
+                  { value = 'https://canadacentral.api.cognitive.microsoft.com/' , title = 'Canada Central - canadacentral.api.cognitive.microsoft.com' },
+                  { value = 'https://centralindia.api.cognitive.microsoft.com/' , title = 'Central India - centralindia.api.cognitive.microsoft.com' },
+                  { value = 'https://uksouth.api.cognitive.microsoft.com/' , title = 'UK South - uksouth.api.cognitive.microsoft.com' },
+                  { value = 'https://japaneast.api.cognitive.microsoft.com/' , title = 'Japan East - japaneast.api.cognitive.microsoft.com' },
+              },
+              value = bind { key = 'visionBaseURL', object = prefs },
             },
          },
 
@@ -222,8 +246,8 @@ function AzureVisionTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, prope
             spacing = viewFactory:control_spacing(),
 
             viewFactory:checkbox {
-               title = LOC '$$$/AzureVisionTagger/Settings/alsoSelectNewKeywords=also autoselct new keywords',
-               tooltip = "Selecting this option will also autoselct keywords which are not already in your keyword list",
+               title = LOC '$$$/AzureVisionTagger/Settings/alsoSelectNewKeywords=Also automatically select new keywords',
+               tooltip = "Selecting this option will also autoselect keywords which are not already in your keyword list",
                value = bind { key = 'alsoSelectNewKeywords', object = prefs },
             }
          },
@@ -303,6 +327,7 @@ function AzureVisionTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, prope
          },
          viewFactory:spacer { width = 1, height = 4 },
 
+         --[[-------------------------------------------
          viewFactory:row {
             spacing = viewFactory:label_spacing(),
 
@@ -341,7 +366,8 @@ function AzureVisionTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, prope
                },
                value = bind { key = 'keywordLanguage', object = prefs },
             },
-         },
+         }, 
+         ]]-------------------------------------------
       }
    }
 end
