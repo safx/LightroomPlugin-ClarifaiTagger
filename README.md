@@ -11,7 +11,7 @@ This Lightroom plugin helps you to add keywords to your photos, powered by the [
 
 ## Create a Developer Account on azure.microsoft.com
 
-To use ClarifaiTagger, you must first create an account on [Microsoft Azure](https://azure.microsoft.com/) and create a.
+To use AzureVisionTagger, you must first create an account on [Microsoft Azure](https://azure.microsoft.com/) and create a.
 
 1. Go to  [azure.microsoft.com](https://azure.microsoft.com/) and create an accout.
 
@@ -54,7 +54,7 @@ To install AzureVision, follow these steps:
 
     ![](Images/plugin_select.png)
 
-1. After a few seconds, the Clarifai Tagger window should pop up with the keywords suggested by Clarifai for each selected image.
+1. After a few seconds, the AzureVision Tagger window should pop up with the keywords suggested by Azure for each selected image.
 
     ![](Images/azure_vision_tagger.png)
 

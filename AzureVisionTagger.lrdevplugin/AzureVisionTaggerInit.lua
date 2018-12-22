@@ -6,8 +6,8 @@ local defaultPrefValues = {
    -- Azure CONFIGURATION
    visionKey = 'Copy from portal.azure.com',
    visionBaseURL = 'https://westeurope.api.cognitive.microsoft.com/',
-   imageSize = 600, -- Default for size of image sent to Clarifai
-   --keywordLanguage = '', -- Default is language used for creating your Clarifai application
+   imageSize = 600, -- Default for size of image sent to Azure
+   --keywordLanguage = '', 
 
    -- TAGGING WINDOW SETTINGS
    thumbnailSize = 300, -- Thumbnails shown above columns of keyword checkboxes
@@ -17,7 +17,7 @@ local defaultPrefValues = {
    autoSelectExistingKeywords = true,
     -- Only auto-select keyword suggestions if the probability is above this value
    autoSelectProbabilityThreshold = 85,
-    -- Display the Clarifai-assessed probability for each keyword
+    -- Display the Azure-assessed confidence for each keyword
    showProbability = false,
    -- also autoselect new keywords above the probability threshold
    alsoSelectNewKeywords = false,
@@ -30,9 +30,9 @@ local defaultPrefValues = {
    imagePreviewWindowWidth = 1250,
 
     -- For hierarchical keyword lists, ignore branches in your keyword tree which include
-    -- terms which Clarifai will never return. e.g. branches with species names, custom process tags, etc.
+    -- terms which Azure will never return. e.g. branches with species names, custom process tags, etc.
     -- Skipping branches with many such terms can greatly boost performance since this plugin
-    -- scans all keywords in your Lightroom catalog to match terms returned by Clarifai with
+    -- scans all keywords in your Lightroom catalog to match terms returned by Azure with
     -- existing keywords in your system.
    ignore_keyword_branches = '',
 }

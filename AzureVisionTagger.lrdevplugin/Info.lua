@@ -9,7 +9,7 @@ return {
    LrSdkMinimumVersion = 5.0,
 
    LrToolkitIdentifier = "com.hanebambel.lightroom.plugin.azurevision",
-   LrPluginInfoUrl = "https://github.com/safx/LightroomPlugin-ClarifaiTagger",
+   LrPluginInfoUrl = "https://github.com/hanebambel/LightroomPlugin-AzureVisionTagger",
 
    
    LrPluginName = "AzureVisionTagger",
