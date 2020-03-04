@@ -82,7 +82,7 @@ local function makeWindow(catalog, photos, json)
          logger:info(' concepts ', i);
 
          local respData = json['outputs'][i]['data']
-         local keywords, probs = collectTagsFromData(data, keywords, probs)
+         local keywords, probs = collectTagsFromData(data)
    
          
          local tbl = {
