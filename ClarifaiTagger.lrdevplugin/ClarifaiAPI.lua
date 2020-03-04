@@ -24,12 +24,12 @@ function ClarifaiAPI.getTags_impl(photos, thumbnailPaths)
       --  { field = 'Accept-Language', value = prefs.keywordLanguage },
     };
     
-    local modelID = prefs.modelID
-    if (modelID == "") then
+    local modelId = prefs.modelId
+    if (modelId == "") then
       modelId = defaultModelID
     end
     
-    local redictionURL = baseURL .. modelID .. "/outputs"
+    local redictionURL = baseURL .. modelId .. "/outputs"
     
     local payload_prefix = '{"inputs": ['
     local payload_middle =  ''
