@@ -10,8 +10,8 @@ local logger = LrLogger('ClarifaiAPI')
 logger:enable('print')
 
 
-local tagAPIURL   = 'https://api.clarifai.com/v2/models/aaa03c23b3724a16a56b629203edc62c/outputs'
-
+local baseURL = 'https://api.clarifai.com/v2/models/'
+local defaultModelID = 'aaa03c23b3724a16a56b629203edc62c' -- general v1.5
 --------------------------------
 
 ClarifaiAPI = {}
@@ -23,7 +23,14 @@ function ClarifaiAPI.getTags_impl(photos, thumbnailPaths)
        { field = 'Content-Type', value = 'application/json' },
       --  { field = 'Accept-Language', value = prefs.keywordLanguage },
     };
-
+    
+    local modelID = prefs.modelID
+    if (modelID == "") then
+      modelId = defaultModelID
+    end
+    
+    local redictionURL = baseURL .. modelID .. "/outputs"
+    
     local payload_prefix = '{"inputs": ['
     local payload_middle =  ''
     local payload_postfix = ']}'
@@ -34,7 +41,7 @@ function ClarifaiAPI.getTags_impl(photos, thumbnailPaths)
     payload_middle = payload_middle:sub(1, -2)
     local payload = payload_prefix .. payload_middle .. payload_postfix;
     logger:info(' get tags START');
-    local body, reshdrs = LrHttp.post(tagAPIURL, payload, headers, "POST", 50, string.len(payload))
+    local body, reshdrs = LrHttp.post(redictionURL, payload, headers, "POST", 50, string.len(payload))
     -- logger:info(' get tags body: ', body);
 
    local json = JSON:decode(body);

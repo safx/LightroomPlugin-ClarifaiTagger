@@ -12,14 +12,14 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
 
    return {
       {
-         title = LOC '$$$/ClarifaiTagger/Settings/AuthHeader=Authentication Settings',
+         title = LOC '$$$/ClarifaiTagger/Settings/AuthHeader=Clarifai Settings',
 
          viewFactory:row {
             spacing = viewFactory:label_spacing(),
 
             viewFactory:static_text {
                tooltip = "Copy from your Clarifai Account https://developer.clarifai.com/account/api-keys.",
-               title = LOC '$$$/ClarifaiTagger/Settings/Heading=You need to create an account on clarifai.ai and create a new API key.',
+               title = LOC '$$$/ClarifaiTagger/Settings/Heading=You need to create an account on clarifai.com and create a new API key.',
                alignment = 'right',
                -- width = share 'title_width',
             },
@@ -44,43 +44,23 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
             },
          },
 
-        --  viewFactory:row {
-        --     spacing = viewFactory:label_spacing(),
-         --
-        --     viewFactory:static_text {
-        --        tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
-        --        title = LOC '$$$/ClarifaiTagger/Settings/clientSecret=Client Secret:',
-        --        alignment = 'right',
-        --        -- width = share 'title_width',
-        --     },
-         --
-        --     viewFactory:edit_field {
-        --        tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
-        --        fill_horizonal = 1,
-        --        width_in_chars = 35,
-        --        alignment = 'left',
-        --        value = bind { key = 'clientSecret', object = prefs },
-        --     },
-        --  },
+         viewFactory:row {
+            spacing = viewFactory:label_spacing(),
 
-        --  viewFactory:row {
-        --     spacing = viewFactory:label_spacing(),
-         --
-        --     viewFactory:static_text {
-        --        title = LOC '$$$/ClarifaiTagger/Settings/AccessToken=Access Token:',
-        --        alignment = 'right',
-        --        -- width = share 'title_width',
-        --     },
-         --
-        --     viewFactory:edit_field {
-        --        fill_horizonal = 1,
-        --        width_in_chars = 35,
-        --        alignment = 'left',
-        --        enabled = false,
-        --        value = bind { key = 'accessToken', object = prefs },
-        --     },
-        --  },
-         -- viewFactory:separator { fill_horizontal = 1 },
+            viewFactory:static_text {
+               tooltip = "Copy model ID from clarifai",
+               title = LOC '$$$/ClarifaiTagger/Settings/ModelID=Model ID:',
+               alignment = 'right',
+            },
+
+            viewFactory:edit_field {
+               tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
+               fill_horizonal = 1,
+               width_in_chars = 35,
+               alignment = 'left',
+               value = bind { key = 'modelId', object = prefs },
+            },
+         },
       },
 
       {
