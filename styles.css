@@ -1,12 +1,15 @@
 :root {
   --main-bg-color: white;
   --alt-bg-color: #c0bfc6;
+  --primary-color: #0f068b;
+
+  --text-light-color: white;
 }
 
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translate3d(0, 5rem, 0);
+    transform: translate3d(0, 3rem, 0);
   }
   to {
     opacity: 1;
@@ -37,8 +40,22 @@ body {
   width: 100%;
 }
 
+.link {
+  color: var(--primary-color);
+}
+
+.button {
+  padding: 1rem;
+  color: var(--text-light-color);
+  background-color: var(--primary-color);
+  border-radius: 0.75rem;
+  text-decoration: none;
+}
+
 .hero {
-  background-color: #c0bfc6;
+  max-height: 40rem;
+  background-color: var(--alt-bg-color);
+  overflow: hidden;
 }
 
 .hero-text {
@@ -58,6 +75,6 @@ body {
 }
 
 .hero-img {
-  max-width: 100%;
+  max-width: 200%;
   animation: 0.7s ease fadeUp;
 }
