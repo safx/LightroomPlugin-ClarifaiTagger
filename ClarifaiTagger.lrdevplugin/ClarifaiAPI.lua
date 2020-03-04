@@ -58,6 +58,7 @@ function ClarifaiAPI.modelNameToModelID(name)
     ["food"]="bd367be194cf45149e75f01d59f77ba7",
     ["color"]="eeed0b6733a644cea07cf4c60f87ebb7",
     ["travel"]="eee28c313d69466f836ab83287a54ed9",
+    ["wedding"]="c386b7a870114f4a87477c0824499348",
   }
   local modelId = modelNameToID[name]
   if (modelId == nil) then
