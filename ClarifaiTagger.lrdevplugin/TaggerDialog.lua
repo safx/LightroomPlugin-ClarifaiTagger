@@ -254,7 +254,7 @@ local function collectTagsFromData(data, keywords, probs)
 
    -- collect colors for color model
    if (data['colors'] ~= nil) then
-      for i, color in ipairs(data['color']) do
+      for i, color in ipairs(data['colors']) do
          table.insert( probs, color['value'] )
          table.insert( keywords, color['w3c']['name'] )
       end
