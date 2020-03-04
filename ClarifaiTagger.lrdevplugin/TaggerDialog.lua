@@ -80,14 +80,11 @@ local function makeWindow(catalog, photos, json)
          --  local keywords = json['results'][i]['result']['tag']['classes']
          --  local probs    = json['results'][i]['result']['tag']['probs']
          logger:info(' concepts ', i);
-         local keywords = {}
-         local probs    = {}
 
          local respData = json['outputs'][i]['data']
-         if (data ~= nil) then
-            collectTagsFromData(data, keywords, probs)
-         end
-
+         local keywords, probs = collectTagsFromData(data, keywords, probs)
+   
+         
          local tbl = {
             spacing = f:label_spacing(8),
             bind_to_object = properties,
@@ -244,11 +241,13 @@ local function makeWindow(catalog, photos, json)
    end )
 end
 
-local function collectTagsFromData(data, keywords, probs)
+local function collectTagsFromData(data)
+   local probs = {}
+   local keywords = {}
    -- collect tags from region
    if (data['regions'] ~= nil) then
       for i, region in ipairs(data['regions']) do
-         collectTagsFromData(data['regions'][i]['data'], keywords, probs)
+         return collectTagsFromData(data['regions'][i]['data'])
       end
    end
 
@@ -268,6 +267,7 @@ local function collectTagsFromData(data, keywords, probs)
          table.insert(probs, concept['value'])
       end
    end
+   return keywords, probs
 end
 
 local function requestJpegThumbnails(target_photos, processed_photos, generated_thumbnails, callback)
