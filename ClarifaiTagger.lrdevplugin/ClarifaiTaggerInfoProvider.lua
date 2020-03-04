@@ -58,7 +58,7 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
                   { value = 'food'   , title = 'Food model: Recognizes more than 1,000 food items in images down to the ingredient level'},
                   { value = 'travel' , title = 'Travel model: Recognizes specific features of residential, hotel, and travel-related properties'},
                   { value = 'color'  , title = 'Color model: Recognizes rensity values for dominant colors present in images'},
-                  ( value = 'wedding', title = 'Wedding model: Recognizes over 400 concepts related to weddings including bride, groom, flowers, and more'),
+                  { value = 'wedding', title = 'Wedding model: Recognizes over 400 concepts related to weddings including bride, groom, flowers, and more'},
                },
                value = bind { key = 'modelName', object = prefs },
             },
