@@ -54,7 +54,7 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
             },
             viewFactory:popup_menu {
                items = {
-                  { value = 'everything', title = 'Recognizes over 11,000 different concepts including objects, themes, moods, and more'},
+                  { value = 'general', title = 'Recognizes over 11,000 different concepts including objects, themes, moods, and more'},
                   { value = 'food'   , title = 'Recognizes more than 1,000 food items in images down to the ingredient level'},
                   { value = 'travel' , title = 'Recognizes specific features of residential, hotel, and travel-related properties'},
                   { value = 'color'  , title = 'Density values for dominant colors present in images'},

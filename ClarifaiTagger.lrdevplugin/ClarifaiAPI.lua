@@ -26,7 +26,7 @@ function ClarifaiAPI.getTags_impl(photos, thumbnailPaths)
     local modelName = prefs.modelName
     modelId = ClarifaiAPI.modelNameToModelID(modelName)
     
-    local redictionURL = baseURL .. modelId .. "/outputs"
+    local redictionURL = baseURL .. modelId .. modelName .. "/outputs"
     
     local payload_prefix = '{"inputs": ['
     local payload_middle =  ''
