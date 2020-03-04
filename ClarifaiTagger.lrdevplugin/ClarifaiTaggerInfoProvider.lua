@@ -18,8 +18,8 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
             spacing = viewFactory:label_spacing(),
 
             viewFactory:static_text {
-               tooltip = "Copy from your Clarifai Account https://developer.clarifai.com/account/api-keys.",
-               title = LOC '$$$/ClarifaiTagger/Settings/Heading=You need to create an account on clarifai.com and create a new API key.',
+               tooltip = "Copy from your Clarifai Account https://portal.clarifai.com/settings/authentication.",
+               title = LOC '$$$/ClarifaiTagger/Settings/Heading=You need to create an account on clarifai.com and create a PAT.',
                alignment = 'right',
                -- width = share 'title_width',
             },
@@ -29,8 +29,8 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
             spacing = viewFactory:label_spacing(),
 
             viewFactory:static_text {
-               tooltip = "Copy from your Clarifai Account https://developer.clarifai.com/account/api-keys.",
-               title = LOC '$$$/ClarifaiTagger/Settings/ClientId=API KEY:',
+               tooltip = "Copy from your Clarifai Account https://portal.clarifai.com/settings/authentication.",
+               title = LOC '$$$/ClarifaiTagger/Settings/ClientId=Personal Access Token:',
                alignment = 'right',
                -- width = share 'title_width',
             },
@@ -49,16 +49,16 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
 
             viewFactory:static_text {
                tooltip = "Copy model ID from clarifai",
-               title = LOC '$$$/ClarifaiTagger/Settings/ModelName=What to Label:',
+               title = LOC '$$$/ClarifaiTagger/Settings/ModelName=Label Category:',
                alignment = 'right',
             },
             viewFactory:popup_menu {
                items = {
-                  { value = 'general', title = 'General model: Recognizes over 11,000 different concepts including objects, themes, moods, and more'},
-                  { value = 'food'   , title = 'Food model: Recognizes more than 1,000 food items in images down to the ingredient level'},
-                  { value = 'travel' , title = 'Travel model: Recognizes specific features of residential, hotel, and travel-related properties'},
-                  { value = 'color'  , title = 'Color model: Recognizes rensity values for dominant colors present in images'},
-                  { value = 'wedding', title = 'Wedding model: Recognizes over 400 concepts related to weddings including bride, groom, flowers, and more'},
+                  { value = 'general', title = 'General: Recognizes over 11,000 different concepts including objects, themes, moods, and more'},
+                  { value = 'food'   , title = 'Food: Recognizes more than 1,000 food items in images down to the ingredient level'},
+                  { value = 'travel' , title = 'Travel: Recognizes specific features of residential, hotel, and travel-related properties'},
+                  { value = 'color'  , title = 'Color: Recognizes rensity values for dominant colors present in images'},
+                  { value = 'wedding', title = 'Wedding: Recognizes over 400 concepts related to weddings including bride, groom, flowers, and more'},
                },
                value = bind { key = 'modelName', object = prefs },
             },
