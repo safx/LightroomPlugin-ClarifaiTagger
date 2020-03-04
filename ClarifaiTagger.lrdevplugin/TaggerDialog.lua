@@ -58,6 +58,36 @@ local function makeCheckbox(i, j, k, tagName, prob, boldKeywords, showProbabilit
    }
 end
 
+
+local function collectTagsFromData(data)
+   local probs = {}
+   local keywords = {}
+   -- collect tags from region
+   if (data['regions'] ~= nil) then
+      for i, region in ipairs(data['regions']) do
+         return collectTagsFromData(data['regions'][i]['data'])
+      end
+   end
+
+   -- collect colors for color model
+   if (data['colors'] ~= nil) then
+      for i, color in ipairs(data['colors']) do
+         table.insert( probs, color['value'] )
+         table.insert( keywords, color['w3c']['name'] )
+      end
+   end
+
+   -- collect concepts
+   if (data['concepts'] ~= nil) then
+      for i, concept in ipairs(data['concepts']) do
+         -- logger:info(' concepts: ', concept['name'])
+         table.insert(keywords, concept['name'])
+         table.insert(probs, concept['value'])
+      end
+   end
+   return keywords, probs
+end
+
 -- Builds the tagger Dialog window
 local function makeWindow(catalog, photos, json)
    local results = json['results']
@@ -77,8 +107,6 @@ local function makeWindow(catalog, photos, json)
 
       local columns = {}
       for i, photo in ipairs(photos) do
-         --  local keywords = json['results'][i]['result']['tag']['classes']
-         --  local probs    = json['results'][i]['result']['tag']['probs']
          logger:info(' concepts ', i);
 
          local data = json['outputs'][i]['data']
@@ -186,14 +214,8 @@ local function makeWindow(catalog, photos, json)
                for i, photo in ipairs(photos) do
                   -- local keywords = json['results'][i]['result']['tag']['classes']
 
-                  local keywords = {}
-                  -- local probs    = {}
-                  local concepts = json['outputs'][i]['data']['concepts']
-                  for i, concept in ipairs(concepts) do
-                     logger:info(' concepts: ', concept['name'])
-                     table.insert(keywords, concept['name'])
-                    --  table.insert(probs, concept['value'])
-                  end
+                  local data = json['outputs'][i]['data']
+                  local keywords, probs = collectTagsFromData(data)            
 
                   for j = 1, #keywords do
                      local kwName = keywords[j]
@@ -239,35 +261,6 @@ local function makeWindow(catalog, photos, json)
          end )
       end
    end )
-end
-
-local function collectTagsFromData(data)
-   local probs = {}
-   local keywords = {}
-   -- collect tags from region
-   if (data['regions'] ~= nil) then
-      for i, region in ipairs(data['regions']) do
-         return collectTagsFromData(data['regions'][i]['data'])
-      end
-   end
-
-   -- collect colors for color model
-   if (data['colors'] ~= nil) then
-      for i, color in ipairs(data['colors']) do
-         table.insert( probs, color['value'] )
-         table.insert( keywords, color['w3c']['name'] )
-      end
-   end
-
-   -- collect concepts
-   if (data['concepts'] ~= nil) then
-      for i, concept in ipairs(data['concepts']) do
-         -- logger:info(' concepts: ', concept['name'])
-         table.insert(keywords, concept['name'])
-         table.insert(probs, concept['value'])
-      end
-   end
-   return keywords, probs
 end
 
 local function requestJpegThumbnails(target_photos, processed_photos, generated_thumbnails, callback)
