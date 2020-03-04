@@ -261,7 +261,7 @@ local function collectTagsFromData(data, keywords, probs)
    end
 
    -- collect concepts
-   if (data['concepts'] ~= nil) do
+   if (data['concepts'] ~= nil) then
       for i, concept in ipairs(data['concepts']) do
          -- logger:info(' concepts: ', concept['name'])
          table.insert(keywords, concept['name'])
