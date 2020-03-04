@@ -11,7 +11,6 @@ logger:enable('print')
 
 
 local baseURL = 'https://api.clarifai.com/v2/models/'
-local defaultModelID = 'aaa03c23b3724a16a56b629203edc62c' -- general v1.5
 --------------------------------
 
 ClarifaiAPI = {}
@@ -24,10 +23,8 @@ function ClarifaiAPI.getTags_impl(photos, thumbnailPaths)
       --  { field = 'Accept-Language', value = prefs.keywordLanguage },
     };
     
-    local modelId = prefs.modelId
-    if (modelId == "") then
-      modelId = defaultModelID
-    end
+    local modelName = prefs.modelName
+    modelId = ClarifaiAPI.modelNameToModelID(modelName)
     
     local redictionURL = baseURL .. modelId .. "/outputs"
     
@@ -49,18 +46,24 @@ function ClarifaiAPI.getTags_impl(photos, thumbnailPaths)
 end
 
 function ClarifaiAPI.getTags(photos, thumbnailPaths)
-  --  if prefs.accessToken == nil then
-  --     ClarifaiAPI.getToken();
-  --  end
 
    local json, status = ClarifaiAPI.getTags_impl(photos, thumbnailPaths);
-  --  if status == 401 then
-  --     ClarifaiAPI.getToken();
-  --     json, status = ClarifaiAPI.getTags_impl(photos, thumbnailPaths);
-  --  end
 
    return json
 end
 
+function ClarifaiAPI.modelNameToModelID(name)
+  local modelNameToID = {
+    ["general"]="aaa03c23b3724a16a56b629203edc62c",
+    ["food"]="bd367be194cf45149e75f01d59f77ba7",
+    ["color"]="eeed0b6733a644cea07cf4c60f87ebb7",
+    ["travel"]="eee28c313d69466f836ab83287a54ed9",
+  }
+  local modelId = modelNameToID[name]
+  if (modelId == nil) then
+    modelId = "aaa03c23b3724a16a56b629203edc62c" -- use general as default
+  end
+  return modelId
+end
 
 return ClarifaiAPI

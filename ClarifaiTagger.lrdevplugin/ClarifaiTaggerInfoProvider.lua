@@ -49,16 +49,17 @@ function ClarifaiTaggerInfoProvider.sectionsForTopOfDialog(viewFactory, property
 
             viewFactory:static_text {
                tooltip = "Copy model ID from clarifai",
-               title = LOC '$$$/ClarifaiTagger/Settings/ModelID=Model ID:',
+               title = LOC '$$$/ClarifaiTagger/Settings/ModelName=What to Label:',
                alignment = 'right',
             },
-
-            viewFactory:edit_field {
-               tooltip = "Copy from the setup page on Clarifai.com for your Clarifai application.",
-               fill_horizonal = 1,
-               width_in_chars = 35,
-               alignment = 'left',
-               value = bind { key = 'modelId', object = prefs },
+            viewFactory:popup_menu {
+               items = {
+                  { value = 'everything', title = 'Recognizes over 11,000 different concepts including objects, themes, moods, and more'},
+                  { value = 'food'   , title = 'Recognizes more than 1,000 food items in images down to the ingredient level'},
+                  { value = 'travel' , title = 'Recognizes specific features of residential, hotel, and travel-related properties'},
+                  { value = 'color'  , title = 'Density values for dominant colors present in images'},
+               },
+               value = bind { key = 'modelName', object = prefs },
             },
          },
       },
