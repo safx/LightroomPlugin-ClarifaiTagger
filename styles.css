@@ -1,0 +1,63 @@
+:root {
+  --main-bg-color: white;
+  --alt-bg-color: #c0bfc6;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 5rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeRight {
+  from {
+    opacity: 0;
+    transform: translate3d(-3rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+body {
+  font-family: "Ringside Medium", Sans-Serif;
+}
+
+.nav-menu {
+  padding: 2rem;
+}
+
+.nav-logo {
+  width: 100%;
+}
+
+.hero {
+  background-color: #c0bfc6;
+}
+
+.hero-text {
+  position: absolute;
+  left: 0;
+  top: 12rem;
+  padding: 2rem;
+  text-align: left;
+  border-radius: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  opacity: 0;
+  animation: 0.5s ease fadeRight 0.7s forwards;
+}
+
+.hero-features-item {
+  margin-bottom: 0.5rem;
+}
+
+.hero-img {
+  max-width: 100%;
+  animation: 0.7s ease fadeUp;
+}
